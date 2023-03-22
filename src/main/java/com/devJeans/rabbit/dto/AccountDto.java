@@ -20,7 +20,7 @@ public class AccountDto {
 
     private String email;
 
-    public static final AccountDto convertToDto(Account account) {
+    public static final AccountDto of(Account account) {
         return AccountDto.builder()
                 .firstName(account.getFirstName())
                 .lastName(account.getLastName())

@@ -10,18 +10,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
-import static com.devJeans.rabbit.dto.AccountDto.convertToDto;
+import static com.devJeans.rabbit.dto.AccountDto.of;
 
 @RestController
-@RequestMapping("/v1/oauth")
+@RequestMapping("/user")
 public class AccountController {
 
     @Autowired
     AccountService accountService;
 
-    @GetMapping("/user/info")
+    @GetMapping("/info")
     public ResponseEntity getUserInfo(Principal principal) {
         Account account = accountService.getAccount(Long.valueOf(principal.getName()));
-        return ResponseEntity.ok().body(convertToDto(account));
+        return ResponseEntity.ok().body(of(account));
+    }
+
+    @GetMapping("/photos")
+    public ResponseEntity getAllPhotoOfUser(Principal principal) {
+        Account account = accountService.getAccount(Long.valueOf(principal.getName()));
+
+        return ResponseEntity.ok(account.getPhotos());
     }
 }

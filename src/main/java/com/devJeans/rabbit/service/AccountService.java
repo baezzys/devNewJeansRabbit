@@ -12,6 +12,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -36,7 +37,7 @@ public class AccountService {
     }
 
     public Account getAccount(Long id) {
-        return accountRepository.findById(id).orElse(null);
+        return accountRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     public String loginOAuthGoogle(IdTokenRequestDto requestBody) {
@@ -58,7 +59,7 @@ public class AccountService {
         }
         existingAccount.setFirstName(account.getFirstName());
         existingAccount.setLastName(account.getLastName());
-        existingAccount.setPictureUrl(account.getPictureUrl());
+        existingAccount.setProfilePictureUrl(account.getProfilePictureUrl());
         accountRepository.save(existingAccount);
         return existingAccount;
     }

@@ -4,12 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.server.MethodNotAllowedException;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,7 +28,10 @@ public class Account {
 
     private String email;
 
-    private String pictureUrl;
+    private String profilePictureUrl;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Photo> photos = new ArrayList<>();
 
     private String roles;
 
@@ -37,6 +39,13 @@ public class Account {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.pictureUrl = pictureUrl;
+        this.profilePictureUrl = pictureUrl;
+    }
+
+    public void addPhoto(Photo photo) {
+        if (photos.size() > 5) {
+            throw new RuntimeException("사진을 5개이상 추가할 수 없습니다.");
+        }
+        this.photos.add(photo);
     }
 }
