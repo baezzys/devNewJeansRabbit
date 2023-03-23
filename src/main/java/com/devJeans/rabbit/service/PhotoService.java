@@ -23,11 +23,17 @@ import java.io.IOException;
 @Slf4j
 public class PhotoService {
 
-    @Autowired
-    PhotoRepository photoRepository;
+    private final PhotoRepository photoRepository;
 
-    @Autowired
-    private AmazonS3 s3client;
+    private final AmazonS3 s3client;
+
+    private final AccountService accountService;
+
+    public PhotoService(PhotoRepository photoRepository, AmazonS3 s3client, AccountService accountService) {
+        this.photoRepository = photoRepository;
+        this.s3client = s3client;
+        this.accountService = accountService;
+    }
 
     @Transactional
     public Photo uploadPhoto(MultipartFile file, Account user) throws IOException {
@@ -62,5 +68,16 @@ public class PhotoService {
     public Page<Photo> findAllPhoto(int page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("likeCount").descending());
         return photoRepository.findAll(pageable);
+    }
+
+    public void deletePhoto(Long userId, Long photoId) {
+        Account user = accountService.getAccount(userId);
+        Photo photo = findPhotoById(photoId);
+
+        if (Boolean.FALSE.equals(photo.isOwnedBy(user))) {
+            throw new RuntimeException("해당 계정은 사진을 삭제할 수 있는 권한이 없습니다.");
+        }
+
+        user.deletePhoto(photo);
     }
 }

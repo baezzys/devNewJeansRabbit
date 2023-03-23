@@ -48,4 +48,11 @@ public class Account {
         }
         this.photos.add(photo);
     }
+
+    public void deletePhoto(Photo photo) {
+        if (!this.photos.contains(photo)) {
+            throw new RuntimeException("해당 사진을 삭제할 수 없습니다.");
+        }
+        this.photos.remove(photo);
+    }
 }

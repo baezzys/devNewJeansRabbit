@@ -59,12 +59,26 @@ public class PhotoController {
         return succeed(PhotoDto.of(photo));
     }
 
+    @PostMapping("/like/cancle/{id}")
+    public ApiResult<PhotoDto> cancleLikePhoto(@PathVariable("id") Long photoId) {
+        Photo photo = photoService.findPhotoById(photoId);
+        photo.cancleLikePhoto();
+        photoService.savePhoto(photo);
+        return succeed(PhotoDto.of(photo));
+    }
+
     @GetMapping("/{id}")
     public ApiResult getPhoto(@PathVariable("id") Long photoId) {
         Photo photo = photoService.findPhotoById(photoId);
         photo.addVisitCount();
 
         return succeed(PhotoDto.of(photo));
+    }
+
+    @DeleteMapping("/{id}}")
+    public ApiResult deletePhoto(Principal principal, @PathVariable("id") Long photoId) {
+        photoService.deletePhoto(Long.valueOf(principal.getName()), photoId);
+        return succeed("사진이 정상적으로 삭제 되었습니다. 사진 id : " + photoId);
     }
 
     @GetMapping("/all/ranked")

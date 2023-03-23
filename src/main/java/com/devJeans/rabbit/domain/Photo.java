@@ -63,4 +63,8 @@ public class Photo {
     public String getImageUrl() {
         return imageUrl;
     }
+
+    public boolean isOwnedBy(Account user) {
+        return this.user.equals(user);
+    }
 }
