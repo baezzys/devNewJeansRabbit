@@ -7,6 +7,7 @@ import com.devJeans.rabbit.dto.PhotoDto;
 import com.devJeans.rabbit.service.AccountService;
 import com.devJeans.rabbit.service.PhotoService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 
 import static com.devJeans.rabbit.bind.ApiResult.failed;
 import static com.devJeans.rabbit.bind.ApiResult.succeed;
@@ -63,5 +65,11 @@ public class PhotoController {
         photo.addVisitCount();
 
         return succeed(PhotoDto.of(photo));
+    }
+
+    @GetMapping("/all/ranked")
+    public ApiResult getRankedPhoto(@RequestParam(defaultValue = "0") int page) {
+        Page<Photo> photoPage = photoService.findAllPhoto(page);
+        return succeed(photoPage);
     }
 }
