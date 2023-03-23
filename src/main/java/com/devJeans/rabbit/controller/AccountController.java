@@ -1,5 +1,6 @@
 package com.devJeans.rabbit.controller;
 
+import com.devJeans.rabbit.bind.ApiResult;
 import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
+import static com.devJeans.rabbit.bind.ApiResult.succeed;
 import static com.devJeans.rabbit.dto.AccountDto.of;
 
 @RestController
@@ -20,15 +22,15 @@ public class AccountController {
     AccountService accountService;
 
     @GetMapping("/info")
-    public ResponseEntity getUserInfo(Principal principal) {
+    public ApiResult getUserInfo(Principal principal) {
         Account account = accountService.getAccount(Long.valueOf(principal.getName()));
-        return ResponseEntity.ok().body(of(account));
+        return succeed(account);
     }
 
     @GetMapping("/photos")
-    public ResponseEntity getAllPhotoOfUser(Principal principal) {
+    public ApiResult getAllPhotoOfUser(Principal principal) {
         Account account = accountService.getAccount(Long.valueOf(principal.getName()));
 
-        return ResponseEntity.ok(account.getPhotos());
+        return succeed(account.getPhotos());
     }
 }

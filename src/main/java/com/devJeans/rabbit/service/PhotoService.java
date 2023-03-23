@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.domain.Photo;
 import com.devJeans.rabbit.repository.PhotoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +16,7 @@ import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 
 @Service
+@Slf4j
 public class PhotoService {
 
     @Autowired
@@ -24,15 +26,19 @@ public class PhotoService {
     private AmazonS3 s3client;
 
     public Photo uploadPhoto(MultipartFile file, Account user) throws IOException {
-        String fileName = file.getOriginalFilename();
-        String bucketName = "dev-jeans";
-        String keyName = "photos/" + fileName;
+        log.debug("file upload 시작 : " + file.getOriginalFilename());
 
-        s3client.putObject(new PutObjectRequest(bucketName, keyName, file.getInputStream(), null)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
+        String fileName = file.getOriginalFilename();
+        String bucketName = "devjeans";
+        String keyName = fileName;
+
+        ObjectMetadata objectMetadata = new ObjectMetadata();
+        objectMetadata.setContentLength(file.getInputStream().available());
+
+        s3client.putObject(new PutObjectRequest(bucketName, keyName, file.getInputStream(), objectMetadata));
 
         String photoUrl = "https://" + bucketName + ".s3.amazonaws.com/" + keyName;
-        Photo photo = new Photo(fileName, photoUrl, user);
+        Photo photo = new Photo(photoUrl, fileName, user);
         user.addPhoto(photo);
 
         return photoRepository.save(photo);

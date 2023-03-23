@@ -22,4 +22,16 @@ public class PhotoDto {
     public static PhotoDto of(Photo photo) {
         return new PhotoDto(photo.getImageUrl(), photo.getVisitCount(), photo.getLikeCount());
     }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public int getVisitCount() {
+        return visitCount;
+    }
+
+    public int getLikeCount() {
+        return likeCount;
+    }
 }
