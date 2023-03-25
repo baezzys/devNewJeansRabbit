@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @Slf4j
@@ -28,6 +30,8 @@ public class PhotoService {
     private final AmazonS3 s3client;
 
     private final AccountService accountService;
+
+    private final String BUCKET_NAME = "devjeans";
 
     public PhotoService(PhotoRepository photoRepository, AmazonS3 s3client, AccountService accountService) {
         this.photoRepository = photoRepository;
@@ -40,17 +44,19 @@ public class PhotoService {
         log.debug("file upload 시작 : " + file.getOriginalFilename());
 
         String fileName = file.getOriginalFilename();
-        String bucketName = "devjeans";
-        String keyName = fileName;
+        String keyName = fileName + LocalDateTime.now();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(file.getInputStream().available());
         objectMetadata.setContentType("image/jpeg");
 
-        s3client.putObject(new PutObjectRequest(bucketName, keyName, file.getInputStream(), objectMetadata));
+        s3client.putObject(new PutObjectRequest(BUCKET_NAME, keyName, file.getInputStream(), objectMetadata));
 
-        String photoUrl = "https://" + bucketName + ".s3.amazonaws.com/" + keyName;
-        Photo photo = new Photo(photoUrl, fileName, user);
+        String photoUrl = "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + keyName;
+        Photo photo = new Photo(photoUrl, keyName, user);
+        if (photoRepository.findByFileName(keyName).isPresent()) {
+            throw new IllegalArgumentException("동일한 사진이 s3 저장소에 존재합니다.");
+        }
         user.addPhoto(photo);
 
         return photoRepository.save(photo);
@@ -70,6 +76,7 @@ public class PhotoService {
         return photoRepository.findAll(pageable);
     }
 
+    @Transactional
     public void deletePhoto(Long userId, Long photoId) {
         Account user = accountService.getAccount(userId);
         Photo photo = findPhotoById(photoId);
@@ -78,6 +85,7 @@ public class PhotoService {
             throw new RuntimeException("해당 계정은 사진을 삭제할 수 있는 권한이 없습니다.");
         }
 
+        s3client.deleteObject(BUCKET_NAME, photo.getFileName());
         user.deletePhoto(photo);
     }
 }

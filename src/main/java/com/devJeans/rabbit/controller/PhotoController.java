@@ -6,11 +6,7 @@ import com.devJeans.rabbit.domain.Photo;
 import com.devJeans.rabbit.dto.PhotoDto;
 import com.devJeans.rabbit.service.AccountService;
 import com.devJeans.rabbit.service.PhotoService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,12 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.List;
 
 import static com.devJeans.rabbit.bind.ApiResult.failed;
 import static com.devJeans.rabbit.bind.ApiResult.succeed;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"}, allowCredentials = "true")
 @RequestMapping("/photo")
 public class PhotoController {
 
@@ -40,15 +36,13 @@ public class PhotoController {
 
 
     @PostMapping("/upload")
-    public ApiResult uploadPhoto(@RequestParam("file") MultipartFile file, Principal principal) {
-        try {
-            Account user = accountService.getAccount(Long.valueOf(principal.getName()));
+    public ApiResult<PhotoDto> uploadPhoto(@RequestParam("file") MultipartFile file, Principal principal) throws IOException {
 
-            Photo savedPhoto = photoService.uploadPhoto(file, user);
-            return succeed(PhotoDto.of(savedPhoto));
-        } catch (Exception e) {
-            return failed(e.getMessage());
-        }
+        Account user = accountService.getAccount(Long.valueOf(principal.getName()));
+
+        Photo savedPhoto = photoService.uploadPhoto(file, user);
+        return succeed(PhotoDto.of(savedPhoto));
+
     }
 
     @PostMapping("/like/{id}")
@@ -60,15 +54,15 @@ public class PhotoController {
     }
 
     @PostMapping("/like/cancle/{id}")
-    public ApiResult<PhotoDto> cancleLikePhoto(@PathVariable("id") Long photoId) {
+    public ApiResult<PhotoDto> cancelLikePhoto(@PathVariable("id") Long photoId) {
         Photo photo = photoService.findPhotoById(photoId);
-        photo.cancleLikePhoto();
+        photo.cancelLikePhoto();
         photoService.savePhoto(photo);
         return succeed(PhotoDto.of(photo));
     }
 
     @GetMapping("/{id}")
-    public ApiResult getPhoto(@PathVariable("id") Long photoId) {
+    public ApiResult<PhotoDto> getPhoto(@PathVariable("id") Long photoId) {
         Photo photo = photoService.findPhotoById(photoId);
         photo.addVisitCount();
 
@@ -76,13 +70,13 @@ public class PhotoController {
     }
 
     @DeleteMapping("/{id}}")
-    public ApiResult deletePhoto(Principal principal, @PathVariable("id") Long photoId) {
+    public ApiResult<String> deletePhoto(Principal principal, @PathVariable("id") Long photoId) {
         photoService.deletePhoto(Long.valueOf(principal.getName()), photoId);
         return succeed("사진이 정상적으로 삭제 되었습니다. 사진 id : " + photoId);
     }
 
     @GetMapping("/all/ranked")
-    public ApiResult getRankedPhoto(@RequestParam(defaultValue = "0") int page) {
+    public ApiResult<Page<Photo>> getRankedPhoto(@RequestParam(defaultValue = "0") int page) {
         Page<Photo> photoPage = photoService.findAllPhoto(page);
         return succeed(photoPage);
     }

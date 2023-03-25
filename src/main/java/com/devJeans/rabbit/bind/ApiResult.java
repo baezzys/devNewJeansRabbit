@@ -1,10 +1,14 @@
 package com.devJeans.rabbit.bind;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class ApiResult<T> {
 
+    @Schema(description = "The result data")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private final T data;
 
     private final String error;

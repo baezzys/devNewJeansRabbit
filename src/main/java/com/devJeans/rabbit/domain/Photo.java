@@ -1,6 +1,7 @@
 package com.devJeans.rabbit.domain;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class Photo {
@@ -37,6 +38,7 @@ public class Photo {
     public Long getId() {
         return id;
     }
+
     public int getLikeCount() {
         return likeCount;
     }
@@ -49,7 +51,7 @@ public class Photo {
         this.likeCount++;
     }
 
-    public void cancleLikePhoto() {
+    public void cancelLikePhoto() {
         if (likeCount == 0) {
             throw new IllegalStateException("좋아요는 음수가 될 수 없습니다.");
         }
@@ -66,5 +68,29 @@ public class Photo {
 
     public boolean isOwnedBy(Account user) {
         return this.user.equals(user);
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Photo)) {
+            return false;
+        }
+        Photo other = (Photo) obj;
+        return Objects.equals(imageUrl, other.getImageUrl()) &&
+                Objects.equals(fileName, other.getFileName()) &&
+                likeCount == other.likeCount &&
+                visitCount == other.visitCount;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(imageUrl, fileName, likeCount, visitCount);
     }
 }
