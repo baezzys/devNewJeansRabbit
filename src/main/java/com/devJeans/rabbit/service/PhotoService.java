@@ -7,7 +7,6 @@ import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.domain.Photo;
 import com.devJeans.rabbit.repository.PhotoRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -71,10 +69,17 @@ public class PhotoService {
     }
 
     @Transactional(readOnly = true)
-    public Page<Photo> findAllPhoto(int page) {
+    public Page<Photo> findAllPhotoOrderByLikeCount(int page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("likeCount").descending());
         return photoRepository.findAll(pageable);
     }
+
+    @Transactional(readOnly = true)
+    public Page<Photo> findAllPhotoOrderByLatest(int page) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdDate").descending());
+        return photoRepository.findAll(pageable);
+    }
+
 
     @Transactional
     public void deletePhoto(Long userId, Long photoId) {

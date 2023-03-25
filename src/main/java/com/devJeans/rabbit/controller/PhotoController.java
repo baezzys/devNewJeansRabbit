@@ -76,8 +76,16 @@ public class PhotoController {
     }
 
     @GetMapping("/all/ranked")
-    public ApiResult<Page<Photo>> getRankedPhoto(@RequestParam(defaultValue = "0") int page) {
-        Page<Photo> photoPage = photoService.findAllPhoto(page);
+    public ApiResult<Page<Photo>> getRankedPhotos(@RequestParam(defaultValue = "0") int page) {
+        Page<Photo> photoPage = photoService.findAllPhotoOrderByLikeCount(page);
         return succeed(photoPage);
     }
+
+    @GetMapping("/all/latest")
+    public ApiResult<Page<Photo>> getLatestPhotos(@RequestParam(defaultValue = "0") int page) {
+        Page<Photo> photoPage = photoService.findAllPhotoOrderByLatest(page);
+
+        return succeed(photoPage);
+    }
+
 }
