@@ -1,6 +1,7 @@
 package com.devJeans.rabbit.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.devJeans.rabbit.domain.Account;
@@ -38,21 +39,29 @@ public class PhotoService {
     }
 
     @Transactional
-    public Photo uploadPhoto(MultipartFile file, Account user) throws IOException {
-        log.debug("file upload 시작 : " + file.getOriginalFilename());
+    public Photo uploadPhoto(MultipartFile image, MultipartFile thumbnail, String photoTitle,Account user) throws IOException {
+        log.debug("file upload 시작 : " + image.getOriginalFilename());
 
-        String fileName = file.getOriginalFilename();
+        String fileName = image.getOriginalFilename();
         String keyName = fileName + LocalDateTime.now();
+        String thumbnailKeyName = "thumbnail/" + fileName + LocalDateTime.now();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(file.getInputStream().available());
+        objectMetadata.setContentLength(image.getInputStream().available());
         objectMetadata.setContentType("image/jpeg");
 
-        s3client.putObject(new PutObjectRequest(BUCKET_NAME, keyName, file.getInputStream(), objectMetadata));
+        ObjectMetadata thumbnailObjectMetadata = new ObjectMetadata();
+        thumbnailObjectMetadata.setContentLength(thumbnail.getInputStream().available());
+        thumbnailObjectMetadata.setContentType("image/jpeg");
+
+        s3client.putObject(new PutObjectRequest(BUCKET_NAME, keyName, image.getInputStream(), objectMetadata));
+        s3client.putObject(new PutObjectRequest(BUCKET_NAME, thumbnailKeyName, thumbnail.getInputStream(), thumbnailObjectMetadata));
 
         String photoUrl = "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + keyName;
-        Photo photo = new Photo(photoUrl, keyName, user);
-        if (photoRepository.findByFileName(keyName).isPresent()) {
+        String thumbnailUrl = "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + keyName;
+
+        Photo photo = new Photo(photoUrl, thumbnailUrl, keyName, thumbnailKeyName, photoTitle, user);
+        if (photoRepository.findByImageKeyName(keyName).isPresent()) {
             throw new IllegalArgumentException("동일한 사진이 s3 저장소에 존재합니다.");
         }
         user.addPhoto(photo);
@@ -90,7 +99,9 @@ public class PhotoService {
             throw new RuntimeException("해당 계정은 사진을 삭제할 수 있는 권한이 없습니다.");
         }
 
-        s3client.deleteObject(BUCKET_NAME, photo.getFileName());
+        s3client.deleteObject(new DeleteObjectRequest(BUCKET_NAME, photo.getImageKeyName()));
+        s3client.deleteObject(new DeleteObjectRequest(BUCKET_NAME, photo.getThumbnailImageKeyName()));
+
         user.deletePhoto(photo);
     }
 }

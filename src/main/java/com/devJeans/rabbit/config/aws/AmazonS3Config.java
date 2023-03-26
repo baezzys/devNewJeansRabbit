@@ -1,4 +1,4 @@
-package com.devJeans.rabbit.config;
+package com.devJeans.rabbit.config.aws;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;

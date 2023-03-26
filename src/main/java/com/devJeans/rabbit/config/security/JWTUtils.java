@@ -1,4 +1,4 @@
-package com.devJeans.rabbit.config;
+package com.devJeans.rabbit.config.security;
 
 import com.devJeans.rabbit.domain.Account;
 import io.jsonwebtoken.Claims;

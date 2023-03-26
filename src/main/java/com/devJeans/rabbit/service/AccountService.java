@@ -1,6 +1,6 @@
 package com.devJeans.rabbit.service;
 
-import com.devJeans.rabbit.config.JWTUtils;
+import com.devJeans.rabbit.config.security.JWTUtils;
 import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.dto.IdTokenRequestDto;
 import com.devJeans.rabbit.repository.AccountRepository;

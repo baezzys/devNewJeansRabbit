@@ -1,4 +1,4 @@
-package com.devJeans.rabbit.config;
+package com.devJeans.rabbit.config.security;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -11,10 +11,19 @@ public class Photo extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String imageUrl; // the key of the photo file stored in S3
+    private String imageUrl;
 
     @Column(nullable = false)
-    private String fileName;
+    private String thumbnailImageUrl;
+
+    @Column(nullable = false)
+    private String imageKeyName;
+
+    @Column(nullable = false)
+    private String thumbnailImageKeyName;
+
+    @Column(nullable = false)
+    private String photoTitle;
 
     @ManyToOne
     private Account user;
@@ -29,9 +38,12 @@ public class Photo extends BaseEntity {
 
     }
 
-    public Photo(String imageUrl, String fileName, Account user) {
+    public Photo(String imageUrl, String thumbnailUrl, String keyName, String thumbnailImageKeyName, String photoTitle, Account user) {
         this.imageUrl = imageUrl;
-        this.fileName = fileName;
+        this.thumbnailImageUrl = thumbnailUrl;
+        this.imageKeyName = keyName;
+        this.thumbnailImageKeyName = thumbnailImageKeyName;
+        this.photoTitle = photoTitle;
         this.user = user;
     }
 
@@ -70,8 +82,8 @@ public class Photo extends BaseEntity {
         return this.user.equals(user);
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getImageKeyName() {
+        return imageKeyName;
     }
 
     @Override
@@ -84,13 +96,25 @@ public class Photo extends BaseEntity {
         }
         Photo other = (Photo) obj;
         return Objects.equals(imageUrl, other.getImageUrl()) &&
-                Objects.equals(fileName, other.getFileName()) &&
+                Objects.equals(imageKeyName, other.getImageKeyName()) &&
                 likeCount == other.likeCount &&
                 visitCount == other.visitCount;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(imageUrl, fileName, likeCount, visitCount);
+        return Objects.hash(imageUrl, imageKeyName, likeCount, visitCount);
+    }
+
+    public String getPhotoTitle() {
+        return photoTitle;
+    }
+
+    public String getThumbnailImageUrl() {
+        return thumbnailImageUrl;
+    }
+
+    public String getThumbnailImageKeyName() {
+        return thumbnailImageKeyName;
     }
 }

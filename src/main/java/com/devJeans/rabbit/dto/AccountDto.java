@@ -20,11 +20,14 @@ public class AccountDto {
 
     private String email;
 
+    private String profileImage;
+
     public static final AccountDto of(Account account) {
         return AccountDto.builder()
                 .firstName(account.getFirstName())
                 .lastName(account.getLastName())
                 .email(account.getEmail())
+                .profileImage(account.getProfilePictureUrl())
                 .build();
     }
 }

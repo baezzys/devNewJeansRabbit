@@ -17,11 +17,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.io.IOException;
 import java.security.Principal;
 
-import static com.devJeans.rabbit.bind.ApiResult.failed;
 import static com.devJeans.rabbit.bind.ApiResult.succeed;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"},  allowCredentials = "true")
 @RequestMapping("/photo")
 public class PhotoController {
 
@@ -36,15 +35,14 @@ public class PhotoController {
 
 
     @PostMapping("/upload")
-    public ApiResult<PhotoDto> uploadPhoto(@RequestParam("file") MultipartFile file, Principal principal) throws IOException {
+    public ApiResult<PhotoDto> uploadPhoto(@RequestParam("image") MultipartFile image, @RequestParam("thumbnail") MultipartFile thumbnail, @RequestParam("photo_title") String photoTitle,Principal principal) throws IOException {
 
         Account user = accountService.getAccount(Long.valueOf(principal.getName()));
 
-        Photo savedPhoto = photoService.uploadPhoto(file, user);
+        Photo savedPhoto = photoService.uploadPhoto(image, thumbnail, photoTitle, user);
         return succeed(PhotoDto.of(savedPhoto));
 
     }
-
     @PostMapping("/like/{id}")
     public ApiResult<PhotoDto> likePhoto(@PathVariable("id") Long photoId) {
         Photo photo = photoService.findPhotoById(photoId);
@@ -69,7 +67,7 @@ public class PhotoController {
         return succeed(PhotoDto.of(photo));
     }
 
-    @DeleteMapping("/{id}}")
+    @DeleteMapping("/{id}")
     public ApiResult<String> deletePhoto(Principal principal, @PathVariable("id") Long photoId) {
         photoService.deletePhoto(Long.valueOf(principal.getName()), photoId);
         return succeed("사진이 정상적으로 삭제 되었습니다. 사진 id : " + photoId);

@@ -1,4 +1,4 @@
-package com.devJeans.rabbit.config;
+package com.devJeans.rabbit.config.util;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
