@@ -10,6 +10,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.devJeans.rabbit.bind.ApiResult.failed;
@@ -43,8 +45,39 @@ public class LoginController {
         }
     }
 
+    @PostMapping("/logout")
+    public ApiResult Logout(HttpServletRequest request, HttpServletResponse response) {
+        String authToken = getTokenFromRequest(request);
+
+        // Remove the authentication cookie
+        final ResponseCookie cookie = ResponseCookie.from("AUTH-TOKEN", "")
+                .httpOnly(false)
+                .maxAge(0)
+                .path("/")
+                .sameSite("None")
+                .secure(true)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return succeed("로그아웃 되었습니다.");
+    }
+
     @GetMapping("/health")
     public ApiResult healthCheck() {
         return succeed("health check success");
+    }
+
+    private String getTokenFromRequest(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("AUTH-TOKEN")) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 }
