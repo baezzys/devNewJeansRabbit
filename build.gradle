@@ -44,6 +44,7 @@ dependencies {
             'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.431'
     runtimeOnly 'com.h2database:h2:2.1.212'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.2'
 
     testImplementation("org.testcontainers:mysql:1.17.6")
     testImplementation("org.testcontainers:testcontainers:1.17.6")
