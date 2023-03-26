@@ -30,7 +30,7 @@ public class Account {
 
     private String profilePictureUrl;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Photo> photos = new ArrayList<>();
 
     private String roles;
@@ -43,8 +43,8 @@ public class Account {
     }
 
     public void addPhoto(Photo photo) {
-        if (photos.size() > 5) {
-            throw new RuntimeException("사진을 5개이상 추가할 수 없습니다.");
+        if (photos.size() >= 6) {
+            throw new RuntimeException("사진을 7개이상 추가할 수 없습니다.");
         }
         this.photos.add(photo);
     }

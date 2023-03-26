@@ -25,7 +25,7 @@ public class Photo extends BaseEntity {
     @Column(nullable = false)
     private String photoTitle;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Account user;
 
     @Column(nullable = false)
@@ -116,5 +116,9 @@ public class Photo extends BaseEntity {
 
     public String getThumbnailImageKeyName() {
         return thumbnailImageKeyName;
+    }
+
+    public Account getUser() {
+        return user;
     }
 }
