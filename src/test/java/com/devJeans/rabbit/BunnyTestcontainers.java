@@ -17,10 +17,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @org.testcontainers.junit.jupiter.Testcontainers
-@ContextConfiguration(initializers = {Testcontainers.Initializer.class})
+@ContextConfiguration(initializers = {BunnyTestcontainers.Initializer.class})
 @TestPropertySource(properties = {"spring.config.location=classpath:application-test.yml"})
 @ActiveProfiles("test-container")
-public @interface Testcontainers {
+public @interface BunnyTestcontainers {
 
     @Container
     MySQLContainer mySQLContainer = new MySQLContainer<>("mysql:8.0.30")
