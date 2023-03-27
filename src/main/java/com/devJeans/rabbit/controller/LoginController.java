@@ -18,7 +18,7 @@ import static com.devJeans.rabbit.bind.ApiResult.failed;
 import static com.devJeans.rabbit.bind.ApiResult.succeed;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"},  allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"}, allowCredentials = "true")
 @RequestMapping("/v1/oauth")
 public class LoginController {
 
@@ -27,28 +27,22 @@ public class LoginController {
 
     @PostMapping("/login")
     public ApiResult LoginWithGoogleOauth2(@RequestBody IdTokenRequestDto requestBody, HttpServletResponse response) {
-        try {
-            String authToken = accountService.loginOAuthGoogle(requestBody);
-            final ResponseCookie cookie = ResponseCookie.from("AUTH-TOKEN", authToken)
-                    .httpOnly(false)
-                    .maxAge(3600 * 24)
-                    .path("/")
-                    .sameSite("None")
-                    .secure(true)
-                    .build();
-            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-            return succeed("JWT가 정상적으로 발급도었습니다.");
-        } catch (IllegalArgumentException e) {
-            return failed("Google id token이 만료되었습니다.", HttpStatus.UNAUTHORIZED.value());
-        } catch (Exception e) {
-            return failed(e.getMessage());
-        }
+
+        String authToken = accountService.loginOAuthGoogle(requestBody);
+        final ResponseCookie cookie = ResponseCookie.from("AUTH-TOKEN", authToken)
+                .httpOnly(false)
+                .maxAge(3600 * 24)
+                .path("/")
+                .sameSite("None")
+                .secure(true)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        return succeed("JWT가 정상적으로 발급도었습니다.");
+
     }
 
     @PostMapping("/logout")
-    public ApiResult Logout(HttpServletRequest request, HttpServletResponse response) {
-        String authToken = getTokenFromRequest(request);
-
+    public ApiResult Logout(HttpServletResponse response) {
         // Remove the authentication cookie
         final ResponseCookie cookie = ResponseCookie.from("AUTH-TOKEN", "")
                 .httpOnly(false)
@@ -65,19 +59,5 @@ public class LoginController {
     @GetMapping("/health")
     public ApiResult healthCheck() {
         return succeed("health check success");
-    }
-
-    private String getTokenFromRequest(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("AUTH-TOKEN")) {
-                    return cookie.getValue();
-                }
-            }
-        }
-
-        return null;
     }
 }

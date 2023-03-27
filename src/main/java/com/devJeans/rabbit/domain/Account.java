@@ -30,6 +30,9 @@ public class Account {
 
     private String profilePictureUrl;
 
+    @ElementCollection
+    private List<Long> likedPhotoIds = new ArrayList<>();
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Photo> photos = new ArrayList<>();
 
@@ -54,5 +57,15 @@ public class Account {
             throw new RuntimeException("해당 사진을 삭제할 수 없습니다.");
         }
         this.photos.remove(photo);
+    }
+
+    public void addLikedPhoto(Photo photo) {
+        if (!likedPhotoIds.contains(photo.getId())) {
+            likedPhotoIds.add(photo.getId());
+        }
+    }
+
+    public void removeLikedPhoto(Photo photo) {
+        likedPhotoIds.remove(photo.getId());
     }
 }

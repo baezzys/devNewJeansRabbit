@@ -6,7 +6,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.http.HttpStatus;
 
-public class ApiResult<T> {
+public class ApiResult<T>  {
 
     @Schema(description = "The result data")
     @JsonInclude(JsonInclude.Include.NON_NULL)

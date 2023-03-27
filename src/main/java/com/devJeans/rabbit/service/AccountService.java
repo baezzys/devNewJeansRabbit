@@ -9,6 +9,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +45,7 @@ public class AccountService {
     public String loginOAuthGoogle(IdTokenRequestDto requestBody) {
         Account account = verifyIDToken(requestBody.getIdToken());
         if (account == null) {
-            throw new IllegalArgumentException();
+            throw new JwtException("Google id token이 만료되었습니다.");
         }
         account = createOrUpdateUser(account);
         return jwtUtils.createToken(account, false);

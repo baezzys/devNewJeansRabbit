@@ -7,6 +7,7 @@ import com.devJeans.rabbit.dto.PhotoDto;
 import com.devJeans.rabbit.service.AccountService;
 import com.devJeans.rabbit.service.PhotoService;
 import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,17 +45,31 @@ public class PhotoController {
 
     }
     @PostMapping("/like/{id}")
-    public ApiResult<PhotoDto> likePhoto(@PathVariable("id") Long photoId) {
+    @Transactional
+    public ApiResult<PhotoDto> likePhoto(@PathVariable("id") Long photoId, Principal principal) {
+        Account user = accountService.getAccount(Long.valueOf(principal.getName()));
+
         Photo photo = photoService.findPhotoById(photoId);
-        photo.likePhoto();
-        photoService.savePhoto(photo);
+        user.addLikedPhoto(photo);
+        synchronized(photo) {
+            photo.likePhoto();
+            photoService.savePhoto(photo);
+        }
         return succeed(PhotoDto.of(photo));
     }
 
     @PostMapping("/like/cancle/{id}")
-    public ApiResult<PhotoDto> cancelLikePhoto(@PathVariable("id") Long photoId) {
+    @Transactional
+    public ApiResult<PhotoDto> cancelLikePhoto(@PathVariable("id") Long photoId, Principal principal) {
+        Account user = accountService.getAccount(Long.valueOf(principal.getName()));
+
         Photo photo = photoService.findPhotoById(photoId);
-        photo.cancelLikePhoto();
+        user.removeLikedPhoto(photo);
+        synchronized(photo) {
+            photo.cancelLikePhoto();
+            photoService.savePhoto(photo);
+        }
+
         photoService.savePhoto(photo);
         return succeed(PhotoDto.of(photo));
     }
@@ -85,6 +100,16 @@ public class PhotoController {
         Page<Photo> photoPage = photoService.findAllPhotoOrderByLatest(page);
         Page<PhotoDto> photoDtoPage = photoPage.map(PhotoDto::of);
         return succeed(photoDtoPage);
+    }
+
+    @GetMapping("/user/like")
+    public ApiResult<Boolean> isLikePhoto(Principal principal, Long photoId) {
+        Account user = accountService.getAccount(Long.valueOf(principal.getName()));
+
+        if (user.getLikedPhotoIds().contains(photoId)) {
+            return succeed(Boolean.TRUE);
+        }
+        return succeed(Boolean.FALSE);
     }
 
 }

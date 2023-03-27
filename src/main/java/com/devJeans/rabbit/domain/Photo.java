@@ -34,6 +34,9 @@ public class Photo extends BaseEntity {
     @Column(nullable = false)
     private int visitCount = 0;
 
+    @Version
+    private int version;
+
     public Photo() {
 
     }
