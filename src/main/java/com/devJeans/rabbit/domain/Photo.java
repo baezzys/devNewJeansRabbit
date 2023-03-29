@@ -26,7 +26,7 @@ public class Photo extends BaseEntity {
     private String photoTitle;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Account user;
+    private Account userCreated;
 
     @Column(nullable = false)
     private int likeCount = 0;
@@ -35,19 +35,20 @@ public class Photo extends BaseEntity {
     private int visitCount = 0;
 
     @Version
-    private int version;
+    Long version;
 
-    public Photo() {
 
-    }
-
-    public Photo(String imageUrl, String thumbnailUrl, String keyName, String thumbnailImageKeyName, String photoTitle, Account user) {
+    public Photo(String imageUrl, String thumbnailUrl, String keyName, String thumbnailImageKeyName, String photoTitle, Account userCreated) {
         this.imageUrl = imageUrl;
         this.thumbnailImageUrl = thumbnailUrl;
         this.imageKeyName = keyName;
         this.thumbnailImageKeyName = thumbnailImageKeyName;
         this.photoTitle = photoTitle;
-        this.user = user;
+        this.userCreated = userCreated;
+    }
+
+    public Photo() {
+
     }
 
     public Long getId() {
@@ -62,7 +63,7 @@ public class Photo extends BaseEntity {
         return visitCount;
     }
 
-    public void likePhoto() {
+    public synchronized void likePhoto() {
         this.likeCount++;
     }
 
@@ -82,31 +83,11 @@ public class Photo extends BaseEntity {
     }
 
     public boolean isOwnedBy(Account user) {
-        return this.user.equals(user);
+        return this.userCreated.equals(user);
     }
 
     public String getImageKeyName() {
         return imageKeyName;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof Photo)) {
-            return false;
-        }
-        Photo other = (Photo) obj;
-        return Objects.equals(imageUrl, other.getImageUrl()) &&
-                Objects.equals(imageKeyName, other.getImageKeyName()) &&
-                likeCount == other.likeCount &&
-                visitCount == other.visitCount;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(imageUrl, imageKeyName, likeCount, visitCount);
     }
 
     public String getPhotoTitle() {
@@ -121,7 +102,10 @@ public class Photo extends BaseEntity {
         return thumbnailImageKeyName;
     }
 
-    public Account getUser() {
-        return user;
+    public Account getUserCreated() {
+        return userCreated;
     }
+
+
+
 }

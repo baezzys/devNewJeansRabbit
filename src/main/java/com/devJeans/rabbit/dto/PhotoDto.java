@@ -2,9 +2,13 @@ package com.devJeans.rabbit.dto;
 
 import com.devJeans.rabbit.domain.Photo;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@NoArgsConstructor
+@JsonIgnoreProperties
 public class PhotoDto {
 
 
@@ -41,7 +45,7 @@ public class PhotoDto {
     }
 
     public static PhotoDto of(Photo photo) {
-        return new PhotoDto(photo.getId(), photo.getImageUrl(), photo.getThumbnailImageUrl(), photo.getPhotoTitle(), photo.getVisitCount(), photo.getLikeCount(), AccountDto.of(photo.getUser()), photo.getCreatedDate(), photo.getLastModifiedDate());
+        return new PhotoDto(photo.getId(), photo.getImageUrl(), photo.getThumbnailImageUrl(), photo.getPhotoTitle(), photo.getVisitCount(), photo.getLikeCount(), AccountDto.of(photo.getUserCreated()), photo.getCreatedDate(), photo.getLastModifiedDate());
     }
 
     public String getImageUrl() {

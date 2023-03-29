@@ -21,6 +21,7 @@ public class ApiResult<T>  {
         this.status = status;
     }
 
+
     public static <T> ApiResult<T> succeed(T data) {
         return new ApiResult<>(data, null, HttpStatus.OK.value());
     }

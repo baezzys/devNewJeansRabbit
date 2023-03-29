@@ -8,6 +8,7 @@ import com.devJeans.rabbit.dto.PhotoDto;
 import com.devJeans.rabbit.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -26,6 +27,7 @@ public class AccountController {
     AccountService accountService;
 
     @GetMapping("/info")
+    @Transactional
     public ApiResult<AccountDto> getUserInfo(Principal principal) {
         Account account = accountService.getAccount(Long.valueOf(principal.getName()));
         return succeed(AccountDto.of(account));
@@ -35,6 +37,6 @@ public class AccountController {
     public ApiResult<List<PhotoDto>> getAllPhotoOfUser(Principal principal) {
         Account account = accountService.getAccount(Long.valueOf(principal.getName()));
 
-        return succeed(account.getPhotos().stream().map(photo -> PhotoDto.of(photo)).collect(Collectors.toList()));
+        return succeed(account.getCreatedPhotos().stream().map(photo -> PhotoDto.of(photo)).collect(Collectors.toList()));
     }
 }
