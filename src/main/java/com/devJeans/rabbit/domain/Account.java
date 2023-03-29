@@ -7,10 +7,7 @@ import lombok.Setter;
 import org.springframework.web.server.MethodNotAllowedException;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Getter
@@ -33,9 +30,14 @@ public class Account {
     private String profilePictureUrl;
 
     @OneToMany
+    @JoinTable(
+            name = "account_liked_photos",
+            joinColumns = @JoinColumn(name = "account_id"),
+            inverseJoinColumns = @JoinColumn(name = "photo_id")
+    )
     private Set<Photo> likedPhotos = new HashSet<>();
 
-    @OneToMany(mappedBy = "userCreated")
+    @OneToMany(mappedBy = "userCreated", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> createdPhotos = new ArrayList<>();
 
     private String roles;
@@ -66,7 +68,17 @@ public class Account {
         if (!this.createdPhotos.contains(photo)) {
             throw new RuntimeException("해당 사진을 삭제할 수 없습니다.");
         }
+        Iterator<Photo> iterator = this.likedPhotos.iterator();
+        while (iterator.hasNext()) {
+            Photo likedPhoto = iterator.next();
+            if (likedPhoto.getId().equals(photo.getId())) {
+                iterator.remove();
+                break;
+            }
+        }
+
         this.createdPhotos.remove(photo);
+
     }
 
     public void addLikedPhoto(Photo photo) {
@@ -75,7 +87,7 @@ public class Account {
         }
     }
 
-    public synchronized void removeLikedPhoto(Photo photo) {
+    public void removeLikedPhoto(Photo photo) {
         if (likedPhotos.contains(photo)) {
             likedPhotos.remove(photo);
         }

@@ -25,7 +25,8 @@ public @interface BunnyTestcontainers {
     @Container
     MySQLContainer mySQLContainer = new MySQLContainer<>("mysql:8.0.30")
             .withDatabaseName("devjeans")
-            .withInitScript("data/devjeans_schema.sql");
+            .withInitScript("data/devjeans_schema.sql")
+            .withCommand("mysqld --max_connections=200");
 
     class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         public void initialize(ConfigurableApplicationContext configurableApplicationContext) {

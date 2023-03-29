@@ -117,5 +117,4 @@ public class PhotoController {
         }
         return succeed(Boolean.FALSE);
     }
-
 }

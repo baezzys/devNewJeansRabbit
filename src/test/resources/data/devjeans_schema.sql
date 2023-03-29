@@ -1,31 +1,42 @@
-
 use devjeans;
 
 CREATE TABLE `account` (
-                           `id` bigint NOT NULL AUTO_INCREMENT,
-                           `first_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                           `last_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                           `email` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                           `profile_picture_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-                           `roles` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-                           PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+                         id BIGINT(20) NOT NULL AUTO_INCREMENT,
+                         first_name VARCHAR(255) NOT NULL,
+                         last_name VARCHAR(255) NOT NULL,
+                         email VARCHAR(255) NOT NULL,
+                         profile_picture_url VARCHAR(255),
+                         roles VARCHAR(255),
+                         PRIMARY KEY (id)
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 5
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci;
 
 CREATE TABLE `photo` (
-                         `id` bigint NOT NULL AUTO_INCREMENT,
-                         `image_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                         `thumbnail_image_url` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                         `image_key_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                         `thumbnail_image_key_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                         `photo_title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-                         `user_id` bigint NOT NULL,
-                         `like_count` int NOT NULL DEFAULT '0',
-                         `visit_count` int NOT NULL DEFAULT '0',
+                         `id` bigint(20) NOT NULL AUTO_INCREMENT,
+                         `image_url` varchar(255) NOT NULL,
+                         `thumbnail_image_url` varchar(255) NOT NULL,
+                         `image_key_name` varchar(255) NOT NULL,
+                         `thumbnail_image_key_name` varchar(255) NOT NULL,
+                         `photo_title` varchar(255) NOT NULL,
+                         `like_count` int(11) NOT NULL,
+                         `visit_count` int(11) NOT NULL,
                          `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
                          `updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                         `user_created_id` bigint(20) NOT NULL,
                          `created_date` datetime(6) DEFAULT NULL,
                          `last_modified_date` datetime(6) DEFAULT NULL,
+                         `version` bigint NOT NULL DEFAULT 0,
                          PRIMARY KEY (`id`),
-                         KEY `fk_user_photo` (`user_id`),
-                         CONSTRAINT `fk_user_photo` FOREIGN KEY (`user_id`) REFERENCES `account` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+                         KEY `FKsnv9fh0m56b0iwyxf2cyf2ovv` (`user_created_id`),
+                         CONSTRAINT `FKsnv9fh0m56b0iwyxf2cyf2ovv` FOREIGN KEY (`user_created_id`) REFERENCES `account` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE account_liked_photos (
+                               account_id BIGINT NOT NULL,
+                               photo_id BIGINT NOT NULL,
+                               PRIMARY KEY (account_id, photo_id),
+                               FOREIGN KEY (account_id) REFERENCES account(id),
+                               FOREIGN KEY (photo_id) REFERENCES photo(id)
+);

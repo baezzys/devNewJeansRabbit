@@ -12,3 +12,25 @@ spring:
       enabled: false
   security:
     enabled: false
+  datasource:
+    hikari:
+      maximum-pool-size: 100
+      idleTimeout: 600000
+
+
+
+aws:
+  s3:
+    accessKey: test
+    secretKey: test
+    region: us-east-1
+logging:
+  level:
+    org:
+      springframework:
+        web: debug
+      hibernate: DEBUG
+
+app:
+  jwtSecret: tessdfdsfdstesdfsdftesfsdfsetsdfsdfsdfdsfsdfdsfsdfsefsefsfsdfsfsefssdfdsfsfsdf
+  googleClientId: tessdfdsfdstesdfsdftesfsdfsetsdfsdfsdfdsfsdfdsfsdfsefsefsfsdfsfsefssdfdsfsfsdf

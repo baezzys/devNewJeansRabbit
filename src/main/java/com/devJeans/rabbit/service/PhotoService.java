@@ -113,6 +113,9 @@ public class PhotoService {
         s3client.deleteObject(new DeleteObjectRequest(BUCKET_NAME, photo.getThumbnailImageKeyName()));
 
         user.deletePhoto(photo);
+        accountRepository.save(user);
+        photoRepository.delete(photo);
+
     }
 
     @Retryable(value = {StaleStateException.class})
@@ -123,6 +126,7 @@ public class PhotoService {
         }
         user.addLikedPhoto(photo);
         photo.likePhoto();
+        accountRepository.save(user);
         photoRepository.save(photo);
     }
 
@@ -130,11 +134,11 @@ public class PhotoService {
     @Transactional
     public void cancelLikePhoto(Photo photo, Account user) {
         if (!user.getLikedPhotos().contains(photo)) {
-            throw new IllegalArgumentException("좋아요를 누르지 않은 사진에 대해서 좋아요 취소를 할 수 없습니다.")
+            throw new IllegalArgumentException("좋아요를 누르지 않은 사진에 대해서 좋아요 취소를 할 수 없습니다.");
         }
         user.removeLikedPhoto(photo);
-
         photo.cancelLikePhoto();
+        accountRepository.save(user);
         photoRepository.save(photo);
 
     }
