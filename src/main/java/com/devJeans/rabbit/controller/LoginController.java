@@ -30,13 +30,14 @@ public class LoginController {
 
         String authToken = accountService.loginOAuthGoogle(requestBody);
         final ResponseCookie cookie = ResponseCookie.from("AUTH-TOKEN", authToken)
-                .httpOnly(false)
+                .httpOnly(true)
                 .maxAge(3600 * 24)
                 .path("/")
-                .sameSite("None")
+                .sameSite("none")
                 .secure(true)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        response.addHeader("Access-Control-Expose-Headers", "Set-Cookie"); // expose Set-Cookie header
         return succeed("JWT가 정상적으로 발급도었습니다.");
 
     }

@@ -29,12 +29,7 @@ public class Account {
 
     private String profilePictureUrl;
 
-    @OneToMany
-    @JoinTable(
-            name = "account_liked_photos",
-            joinColumns = @JoinColumn(name = "account_id"),
-            inverseJoinColumns = @JoinColumn(name = "photo_id")
-    )
+    @ManyToMany(mappedBy = "userLiked")
     private Set<Photo> likedPhotos = new HashSet<>();
 
     @OneToMany(mappedBy = "userCreated", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -65,31 +60,22 @@ public class Account {
     }
 
     public void deletePhoto(Photo photo) {
-        if (!this.createdPhotos.contains(photo)) {
-            throw new RuntimeException("해당 사진을 삭제할 수 없습니다.");
-        }
-        Iterator<Photo> iterator = this.likedPhotos.iterator();
-        while (iterator.hasNext()) {
-            Photo likedPhoto = iterator.next();
-            if (likedPhoto.getId().equals(photo.getId())) {
-                iterator.remove();
-                break;
-            }
-        }
-
+        photo.getUserLiked().clear();
+        photo.setUserCreated(null);
         this.createdPhotos.remove(photo);
-
     }
 
     public void addLikedPhoto(Photo photo) {
         if (!likedPhotos.contains(photo)) {
-            likedPhotos.add(photo);
+            this.likedPhotos.add(photo);
+            photo.getUserLiked().add(this);
         }
     }
 
-    public void removeLikedPhoto(Photo photo) {
+    public synchronized void removeLikedPhoto(Photo photo) {
         if (likedPhotos.contains(photo)) {
-            likedPhotos.remove(photo);
+            this.likedPhotos.remove(photo);
+            photo.getUserLiked().remove(this);
         }
     }
 }

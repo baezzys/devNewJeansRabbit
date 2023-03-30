@@ -1,5 +1,6 @@
 package com.devJeans.rabbit.photo;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.devJeans.rabbit.BunnyTestcontainers;
 import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.domain.Photo;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,21 +51,49 @@ public class PhotoServiceTest {
     @Autowired
     EntityManager em;
 
+    @MockBean
+    AmazonS3 s3client;
+
     @Test
     @Transactional
     void userLikePhotoTest() {
         Account user = new Account("test", "test", "test", "test");
+        Account user2 = new Account("test", "test", "test1", "test");
+
         Photo photo = new Photo("imageurl", "thumbnailurl", "keyname", "thumbnailkeyname", "title", user);
 
         accountRepository.save(user);
+        accountRepository.save(user2);
         photoRepository.save(photo);
 
-        photoService.likePhoto(photo , user);
-        assertEquals(user.getLikedPhotos().contains(photo), Boolean.TRUE);
+        photoService.likePhoto(photo , user2);
+
+        assertEquals(user2.getLikedPhotos().contains(photo), Boolean.TRUE);
         assertEquals(photo.getLikeCount(), 1);
     }
 
     @Test
+    @Transactional
+    void deletePhotoTest() {
+        Account user = new Account("test", "test", "test", "test");
+        Account user2 = new Account("test", "test", "test1", "test");
+
+        Photo photo = new Photo("imageurl", "thumbnailurl", "keyname", "thumbnailkeyname", "title", user);
+
+        accountRepository.save(user);
+        accountRepository.save(user2);
+        photoRepository.save(photo);
+
+        photoService.likePhoto(photo , user2);
+        photoService.likePhoto(photo, user);
+        photoService.deletePhoto(user.getId(), photo.getId());
+
+        assertEquals(user.getCreatedPhotos().size(), 0);
+
+    }
+
+    @Test
+    @Transactional
     public void testLikePhotoServiceConcurrently() throws Exception {
 
         List<Account> accountList = new ArrayList<>();
@@ -100,6 +130,7 @@ public class PhotoServiceTest {
         Photo updatedPhoto = photoRepository.findById(photo.getId()).get();
         System.out.println("테스트 결과 : " + updatedPhoto.getLikeCount());
         assertEquals(50, updatedPhoto.getLikeCount());
+        assertEquals(50, updatedPhoto.getUserLiked().size());
 
         for (Account account : accountList) {
             assertEquals(account.getLikedPhotos().size(), 1);

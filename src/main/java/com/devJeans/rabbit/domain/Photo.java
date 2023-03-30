@@ -1,8 +1,10 @@
 package com.devJeans.rabbit.domain;
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class Photo extends BaseEntity {
@@ -28,6 +30,14 @@ public class Photo extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Account userCreated;
+
+    @ManyToMany
+    @JoinTable(
+            name = "account_liked_photos",
+            joinColumns = @JoinColumn(name = "photo_id"),
+            inverseJoinColumns = @JoinColumn(name = "account_id")
+    )
+    private Set<Account> userLiked = new HashSet<>();
 
     @Column(nullable = false)
     private int likeCount = 0;
@@ -64,7 +74,7 @@ public class Photo extends BaseEntity {
         return visitCount;
     }
 
-    public synchronized void likePhoto() {
+    public void likePhoto() {
         this.likeCount++;
     }
 
@@ -108,5 +118,15 @@ public class Photo extends BaseEntity {
     }
 
 
+    public Set<Account> getUserLiked() {
+        return userLiked;
+    }
 
+    public void setUserLiked(Set<Account> userLiked) {
+        this.userLiked = userLiked;
+    }
+
+    public void setUserCreated(Account userCreated) {
+        this.userCreated = userCreated;
+    }
 }

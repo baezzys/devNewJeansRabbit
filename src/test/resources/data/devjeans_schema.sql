@@ -34,9 +34,9 @@ CREATE TABLE `photo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 CREATE TABLE account_liked_photos (
-                               account_id BIGINT NOT NULL,
-                               photo_id BIGINT NOT NULL,
-                               PRIMARY KEY (account_id, photo_id),
-                               FOREIGN KEY (account_id) REFERENCES account(id),
-                               FOREIGN KEY (photo_id) REFERENCES photo(id)
-);
+                                      account_id BIGINT NOT NULL,
+                                      photo_id BIGINT NOT NULL,
+                                      PRIMARY KEY (account_id, photo_id),
+                                      CONSTRAINT FK_account_liked_photos_account FOREIGN KEY (account_id) REFERENCES account (id),
+                                      CONSTRAINT FK_account_liked_photos_photo FOREIGN KEY (photo_id) REFERENCES photo (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

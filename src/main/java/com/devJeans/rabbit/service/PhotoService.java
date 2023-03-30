@@ -53,8 +53,9 @@ public class PhotoService {
         log.debug("file upload 시작 : " + image.getOriginalFilename());
 
         String fileName = image.getOriginalFilename();
-        String keyName = fileName + LocalDateTime.now();
-        String thumbnailKeyName = "thumbnail/" + fileName + LocalDateTime.now();
+
+        String keyName = LocalDateTime.now() + fileName;
+        String thumbnailKeyName = "thumbnail/" + LocalDateTime.now() + fileName;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(image.getInputStream().available());
@@ -68,7 +69,7 @@ public class PhotoService {
         s3client.putObject(new PutObjectRequest(BUCKET_NAME, thumbnailKeyName, thumbnail.getInputStream(), thumbnailObjectMetadata));
 
         String photoUrl = "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + keyName;
-        String thumbnailUrl = "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + keyName;
+        String thumbnailUrl = "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + thumbnailKeyName;
 
         Photo photo = new Photo(photoUrl, thumbnailUrl, keyName, thumbnailKeyName, photoTitle, user);
         if (photoRepository.findByImageKeyName(keyName).isPresent()) {
@@ -124,10 +125,12 @@ public class PhotoService {
         if (user.getLikedPhotos().contains(photo)) {
             throw new IllegalArgumentException("같은 사진에 좋아요를 2번이상 누를 수 없습니다.");
         }
-        user.addLikedPhoto(photo);
-        photo.likePhoto();
-        accountRepository.save(user);
+        synchronized (photo) {
+            user.addLikedPhoto(photo);
+            photo.likePhoto();
+        }
         photoRepository.save(photo);
+        accountRepository.save(user);
     }
 
     @Retryable(value = {StaleStateException.class})
@@ -136,10 +139,12 @@ public class PhotoService {
         if (!user.getLikedPhotos().contains(photo)) {
             throw new IllegalArgumentException("좋아요를 누르지 않은 사진에 대해서 좋아요 취소를 할 수 없습니다.");
         }
-        user.removeLikedPhoto(photo);
-        photo.cancelLikePhoto();
-        accountRepository.save(user);
+        synchronized (photo) {
+            user.removeLikedPhoto(photo);
+            photo.cancelLikePhoto();
+        }
         photoRepository.save(photo);
+        accountRepository.save(user);
 
     }
 }

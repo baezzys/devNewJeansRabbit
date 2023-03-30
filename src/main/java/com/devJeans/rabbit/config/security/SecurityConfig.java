@@ -1,5 +1,6 @@
 package com.devJeans.rabbit.config.security;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -42,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v1/oauth/login").permitAll()
                 .antMatchers("/v1/oauth/health").permitAll()
                 .antMatchers("/photo/all/*").permitAll()
+                .antMatchers(HttpMethod.GET, "/photo/{id}").permitAll()
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()
                 .anyRequest().authenticated()
                 .and()
