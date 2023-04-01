@@ -122,29 +122,24 @@ public class PhotoService {
     @Retryable(value = {StaleStateException.class})
     @Transactional
     public void likePhoto(Photo photo, Account user) {
-        if (user.getLikedPhotos().contains(photo)) {
+        if (photo.getUserLiked().contains(user)) {
             throw new IllegalArgumentException("같은 사진에 좋아요를 2번이상 누를 수 없습니다.");
         }
         synchronized (photo) {
-            user.addLikedPhoto(photo);
-            photo.likePhoto();
+            photo.likePhoto(user);
         }
         photoRepository.save(photo);
-        accountRepository.save(user);
     }
 
     @Retryable(value = {StaleStateException.class})
     @Transactional
     public void cancelLikePhoto(Photo photo, Account user) {
-        if (!user.getLikedPhotos().contains(photo)) {
+        if (!photo.getUserLiked().contains(user)) {
             throw new IllegalArgumentException("좋아요를 누르지 않은 사진에 대해서 좋아요 취소를 할 수 없습니다.");
         }
         synchronized (photo) {
-            user.removeLikedPhoto(photo);
-            photo.cancelLikePhoto();
+            photo.cancelLikePhoto(user);
         }
         photoRepository.save(photo);
-        accountRepository.save(user);
-
     }
 }

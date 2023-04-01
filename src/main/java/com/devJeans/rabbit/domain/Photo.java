@@ -74,14 +74,18 @@ public class Photo extends BaseEntity {
         return visitCount;
     }
 
-    public void likePhoto() {
+    public void likePhoto(Account user) {
+        this.userLiked.add(user);
         this.likeCount++;
+        user.getLikedPhotos().add(this);
     }
 
-    public void cancelLikePhoto() {
+    public void cancelLikePhoto(Account user) {
         if (likeCount == 0) {
             throw new IllegalStateException("좋아요는 음수가 될 수 없습니다.");
         }
+        this.userLiked.remove(user);
+        user.getLikedPhotos().remove(this);
         this.likeCount--;
     }
 

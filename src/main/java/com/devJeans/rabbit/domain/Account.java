@@ -64,18 +64,4 @@ public class Account {
         photo.setUserCreated(null);
         this.createdPhotos.remove(photo);
     }
-
-    public void addLikedPhoto(Photo photo) {
-        if (!likedPhotos.contains(photo)) {
-            this.likedPhotos.add(photo);
-            photo.getUserLiked().add(this);
-        }
-    }
-
-    public synchronized void removeLikedPhoto(Photo photo) {
-        if (likedPhotos.contains(photo)) {
-            this.likedPhotos.remove(photo);
-            photo.getUserLiked().remove(this);
-        }
-    }
 }
