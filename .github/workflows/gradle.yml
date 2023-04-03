@@ -57,7 +57,7 @@ jobs:
       run: |
         aws deploy create-deployment \
         --application-name devjeans \
-        --deployment-group-name devjeans \
+        --deployment-group-name devjeans-cd \
         --file-exists-behavior OVERWRITE \
         --s3-location bucket=devjeans-cd,bundleType=zip,key=devjeans-cd.zip \
         --region ap-northeast-2
