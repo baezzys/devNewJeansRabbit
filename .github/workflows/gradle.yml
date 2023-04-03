@@ -30,3 +30,21 @@ jobs:
         distribution: 'temurin'
     - name: Build with Gradle
       run: ./gradlew clean build
+      
+    - name: Make Directory for deliver
+      run: mkdir deploy
+      
+    - name: Copy Jar
+      run: cp ./build/libs/*.jar ./deploy/
+      
+    - name: Make zip file
+      run: zip -r -qq -j ./devjeans-build.zip ./deploy
+      
+    - name: Deliver to AWS S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
+        AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+      run: |
+        aws s3 cp \
+        --region ap-northeast-2 \
+        ./devjeans-build.zip s3://devjeans-cd/
