@@ -48,3 +48,16 @@ jobs:
         aws s3 cp \
         --region ap-northeast-2 \
         ./devjeans-build.zip s3://devjeans-cd/
+        
+      # Deploy
+    - name: Deploy
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        aws deploy create-deployment \
+        --application-name devjeans \
+        --deployment-group-name devjeans \
+        --file-exists-behavior OVERWRITE \
+        --s3-location bucket=devjeans-cd,bundleType=zip,key=devjeans-cd.zip \
+        --region ap-northeast-2
