@@ -90,13 +90,13 @@ public class PhotoService {
 
     @Transactional(readOnly = true)
     public Page<Photo> findAllPhotoOrderByLikeCount(int page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("likeCount").descending());
+        Pageable pageable = PageRequest.of(page, 12, Sort.by("likeCount").descending());
         return photoRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<Photo> findAllPhotoOrderByLatest(int page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdDate").descending());
+        Pageable pageable = PageRequest.of(page, 12, Sort.by("createdDate").descending());
         return photoRepository.findAll(pageable);
     }
 
