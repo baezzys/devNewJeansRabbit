@@ -106,7 +106,9 @@ public class PhotoService {
         Account user = accountService.getAccount(userId);
         Photo photo = findPhotoById(photoId);
 
-        if (Boolean.FALSE.equals(photo.isOwnedBy(user)) && Boolean.FALSE.equals(user.getRoles().equals("ADMIN"))) {
+
+
+        if (Boolean.FALSE.equals(photo.isOwnedBy(user)) && Boolean.FALSE.equals(user.isAdmin())) {
             throw new RuntimeException("해당 계정은 사진을 삭제할 수 있는 권한이 없습니다.");
         }
 

@@ -44,7 +44,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v1/oauth/health").permitAll()
                 .antMatchers("/photo/all/*").permitAll()
                 .antMatchers(HttpMethod.GET, "/photo/{id}").permitAll()
-                .antMatchers("/admin/photo/**").hasAnyRole("ADMIN")
+                .antMatchers("/admin/*").hasAnyRole("ADMIN")
                 .antMatchers(PERMIT_URL_ARRAY).permitAll()
                 .anyRequest().authenticated()
                 .and()
