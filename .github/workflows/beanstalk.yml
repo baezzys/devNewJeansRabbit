@@ -52,7 +52,7 @@ jobs:
         run: |
           aws s3 cp \
           --region ap-northeast-2 \
-          ./devjeans-build.zip s3://devjeans-cd/
+          deploy/Devjeans-label-${{steps.current-time.outputs.formattedTime}}-${{github.sha}}.zip s3://devjeans-cd/
 
       - name: Deploy Consumer to EB
         uses: einaregilsson/beanstalk-deploy@v14
