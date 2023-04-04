@@ -21,7 +21,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
-        working-directory: ./server-app
+        working-directory: ./
         run: chmod +x ./gradlew
         shell: bash
 
@@ -40,7 +40,7 @@ jobs:
       - name: Generate deployment package
         run: |
           mkdir -p deploy
-          cp server-app/build/libs/*.jar deploy/
+          cp ./build/libs/*.jar deploy/
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cd deploy && zip -r Devjeans-label-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
