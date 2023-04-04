@@ -35,7 +35,7 @@ public class PhotoService {
 
     private final AccountService accountService;
 
-    private final String BUCKET_NAME = "devjeans";
+    private final String BUCKET_NAME = "devjeans-photo";
 
     private final EntityManager entityManager;
 
