@@ -46,13 +46,13 @@ jobs:
           cd deploy && zip -r Devjeans-label-${{steps.current-time.outputs.formattedTime}}-${{github.sha}} .
 
       - name: Deliver to AWS S3
-            env:
-              AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
-              AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-            run: |
-              aws s3 cp \
-              --region ap-northeast-2 \
-              ./devjeans-build.zip s3://devjeans-cd/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        run: |
+          aws s3 cp \
+          --region ap-northeast-2 \
+          ./devjeans-build.zip s3://devjeans-cd/
 
       - name: Deploy Consumer to EB
         uses: einaregilsson/beanstalk-deploy@v14
