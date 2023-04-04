@@ -21,12 +21,12 @@ jobs:
           distribution: 'temurin'
 
       - name: Grant execute permission for gradlew
-        working-directory: ./
+        working-directory: .
         run: chmod +x ./gradlew
         shell: bash
 
       - name: Build with Gradle
-        working-directory: ./server-app
+        working-directory: .
         run: ./gradlew clean build
         shell: bash
 
