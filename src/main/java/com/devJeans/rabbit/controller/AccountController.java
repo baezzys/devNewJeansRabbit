@@ -19,7 +19,7 @@ import static com.devJeans.rabbit.bind.ApiResult.succeed;
 import static com.devJeans.rabbit.dto.AccountDto.of;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"},  allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"},  allowCredentials = "true")
 @RequestMapping("/user")
 public class AccountController {
 
