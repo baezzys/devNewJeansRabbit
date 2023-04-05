@@ -27,7 +27,7 @@ import java.util.Map;
 import static com.devJeans.rabbit.bind.ApiResult.succeed;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"},  allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com", "https://stg-devjeans.dev-hee.com"},  allowCredentials = "true")
 @RequestMapping("/admin")
 public class AdminController {
 
