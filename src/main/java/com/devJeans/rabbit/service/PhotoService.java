@@ -104,6 +104,7 @@ public class PhotoService {
     @Transactional(readOnly = true)
     public Page<Photo> findAllPhotoOrderByLikeCount(int page) {
         Pageable pageable = PageRequest.of(page, 12, Sort.by("likeCount").descending().and(Sort.by("createdDate").descending()));
+
         return photoRepository.findAll(pageable);
     }
 
@@ -118,6 +119,7 @@ public class PhotoService {
     public void deletePhoto(Long userId, Long photoId) {
         Account user = accountService.getAccount(userId);
         Photo photo = findPhotoById(photoId);
+
 
 
         if (Boolean.FALSE.equals(photo.isOwnedBy(user)) && Boolean.FALSE.equals(user.isAdmin())) {
