@@ -64,4 +64,11 @@ public class Account {
         photo.setUserCreated(null);
         this.createdPhotos.remove(photo);
     }
+
+    public Boolean isAdmin() {
+        if (this.getRoles().equals("ROLE_ADMIN")) {
+            return true;
+        }
+        return false;
+    }
 }
