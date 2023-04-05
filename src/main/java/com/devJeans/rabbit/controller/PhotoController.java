@@ -26,7 +26,7 @@ import java.security.Principal;
 import static com.devJeans.rabbit.bind.ApiResult.succeed;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com", "https://stg-devjeans.dev-hee.com"}, allowCredentials = "true")
 @RequestMapping("/photo")
 public class PhotoController {
 
