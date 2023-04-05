@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -120,7 +121,6 @@ public class PhotoService {
 
     }
 
-    @Retryable(value = {StaleStateException.class})
     @Transactional
     public void likePhoto(Photo photo, Account user) {
         if (photo.getUserLiked().contains(user)) {
@@ -132,7 +132,6 @@ public class PhotoService {
         photoRepository.save(photo);
     }
 
-    @Retryable(value = {StaleStateException.class})
     @Transactional
     public void cancelLikePhoto(Photo photo, Account user) {
         if (!photo.getUserLiked().contains(user)) {

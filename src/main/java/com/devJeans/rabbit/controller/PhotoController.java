@@ -9,6 +9,8 @@ import com.devJeans.rabbit.service.AccountService;
 import com.devJeans.rabbit.service.PhotoService;
 import org.hibernate.StaleStateException;
 import org.springframework.data.domain.Page;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,6 +55,7 @@ public class PhotoController {
     }
 
     @PostMapping("/like/{id}")
+    @Retryable(value = {StaleStateException.class}, backoff = @Backoff(delay = 1000), maxAttempts = 10)
     @Transactional
     public ApiResult<PhotoDto> likePhoto(@PathVariable("id") Long photoId, Principal principal) {
         Account user = accountService.getAccount(Long.valueOf(principal.getName()));
@@ -64,6 +67,7 @@ public class PhotoController {
     }
 
     @PostMapping("/like/cancel/{id}")
+    @Retryable(value = {StaleStateException.class}, backoff = @Backoff(delay = 1000), maxAttempts = 10)
     @Transactional
     public ApiResult<PhotoDto> cancelLikePhoto(@PathVariable("id") Long photoId, Principal principal) {
         Account user = accountService.getAccount(Long.valueOf(principal.getName()));
