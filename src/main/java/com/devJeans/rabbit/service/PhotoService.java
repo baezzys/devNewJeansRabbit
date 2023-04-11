@@ -9,6 +9,7 @@ import com.devJeans.rabbit.domain.Photo;
 import com.devJeans.rabbit.repository.AccountRepository;
 import com.devJeans.rabbit.repository.PhotoRepository;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.hibernate.StaleStateException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,7 +22,11 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.persistence.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 
@@ -50,23 +55,30 @@ public class PhotoService {
     }
 
     @Transactional
-    public Photo uploadPhoto(MultipartFile image, MultipartFile thumbnail, String photoTitle,Account user) throws IOException {
+    public Photo uploadPhoto(MultipartFile image, MultipartFile thumbnail, String photoTitle, Account user) throws IOException {
         log.debug("file upload 시작 : " + image.getOriginalFilename());
 
         String fileName = image.getOriginalFilename();
+
+        // Resize image
+        BufferedImage resizedImage = Thumbnails.of(image.getInputStream()).size(1000, 1000).asBufferedImage();
+        ByteArrayOutputStream resizedImageOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(resizedImage, "jpg", resizedImageOutputStream);
+        byte[] resizedImageBytes = resizedImageOutputStream.toByteArray();
 
         String keyName = LocalDateTime.now() + fileName;
         String thumbnailKeyName = "thumbnail/" + LocalDateTime.now() + fileName;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
-        objectMetadata.setContentLength(image.getInputStream().available());
+        objectMetadata.setContentLength(resizedImageBytes.length);
         objectMetadata.setContentType("image/jpeg");
 
         ObjectMetadata thumbnailObjectMetadata = new ObjectMetadata();
         thumbnailObjectMetadata.setContentLength(thumbnail.getInputStream().available());
         thumbnailObjectMetadata.setContentType("image/jpeg");
 
-        s3client.putObject(new PutObjectRequest(BUCKET_NAME, keyName, image.getInputStream(), objectMetadata));
+        // Upload resized image
+        s3client.putObject(new PutObjectRequest(BUCKET_NAME, keyName, new ByteArrayInputStream(resizedImageBytes), objectMetadata));
         s3client.putObject(new PutObjectRequest(BUCKET_NAME, thumbnailKeyName, thumbnail.getInputStream(), thumbnailObjectMetadata));
 
         String photoUrl = "https://" + BUCKET_NAME + ".s3.amazonaws.com/" + keyName;
@@ -91,7 +103,7 @@ public class PhotoService {
 
     @Transactional(readOnly = true)
     public Page<Photo> findAllPhotoOrderByLikeCount(int page) {
-        Pageable pageable = PageRequest.of(page, 12, Sort.by("likeCount").descending().and(Sort.by("id")));
+        Pageable pageable = PageRequest.of(page, 12, Sort.by("likeCount").descending().and(Sort.by("createdDate").descending()));
         return photoRepository.findAll(pageable);
     }
 

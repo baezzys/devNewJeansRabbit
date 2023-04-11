@@ -53,8 +53,8 @@ public class Account {
     }
 
     public void addPhoto(Photo photo) {
-        if (createdPhotos.size() >= 6) {
-            throw new RuntimeException("사진을 7개이상 추가할 수 없습니다.");
+        if (createdPhotos.size() >= 29) {
+            throw new RuntimeException("사진을 30개이상 추가할 수 없습니다.");
         }
         this.createdPhotos.add(photo);
     }
