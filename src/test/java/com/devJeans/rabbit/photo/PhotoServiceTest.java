@@ -189,8 +189,6 @@ public class PhotoServiceTest {
         }
         Photo result = photoRepository.findById(savedPhoto.getId()).get();
         assertEquals(result.getLikeCount(), 10);
-
-        List<Account> resultAccountList = accountRepository.findAll();
     }
 
     class MockPrincipal implements Principal {

@@ -104,7 +104,6 @@ public class PhotoService {
     @Transactional(readOnly = true)
     public Page<Photo> findAllPhotoOrderByLikeCount(int page) {
         Pageable pageable = PageRequest.of(page, 12, Sort.by("likeCount").descending().and(Sort.by("createdDate").descending()));
-
         return photoRepository.findAll(pageable);
     }
 
