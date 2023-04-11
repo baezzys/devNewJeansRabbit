@@ -31,7 +31,7 @@ public class LoginController {
         String authToken = accountService.loginOAuthGoogle(requestBody);
         final ResponseCookie cookie = ResponseCookie.from("AUTH-TOKEN", authToken)
                 .httpOnly(true)
-                .maxAge(3600 * 24)
+                .maxAge(3600 * 24 * 3)
                 .path("/")
                 .sameSite("none")
                 .secure(true)
