@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import javax.persistence.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -61,10 +62,15 @@ public class PhotoService {
         String fileName = image.getOriginalFilename();
 
         // Resize image
-        BufferedImage resizedImage = Thumbnails.of(image.getInputStream()).size(1000, 1000).asBufferedImage();
+        BufferedImage originalImage = ImageIO.read(image.getInputStream());
+
+        // Resize image
+        BufferedImage resizedImage = resizeImage(originalImage, 1000, 1000);
+
         ByteArrayOutputStream resizedImageOutputStream = new ByteArrayOutputStream();
         ImageIO.write(resizedImage, "jpg", resizedImageOutputStream);
         byte[] resizedImageBytes = resizedImageOutputStream.toByteArray();
+
 
         String keyName = LocalDateTime.now() + fileName;
         String thumbnailKeyName = "thumbnail/" + LocalDateTime.now() + fileName;
@@ -91,6 +97,14 @@ public class PhotoService {
         user.addPhoto(photo);
 
         return photoRepository.save(photo);
+    }
+
+    BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics2D = resizedImage.createGraphics();
+        graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        graphics2D.dispose();
+        return resizedImage;
     }
 
     public Photo findPhotoById(Long id) {
