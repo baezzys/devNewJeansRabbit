@@ -31,6 +31,9 @@ public class Photo extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Account userCreated;
 
+    @Column(nullable = false)
+    Boolean isShow = true;
+
     @ManyToMany
     @JoinTable(
             name = "account_liked_photos",
@@ -132,5 +135,13 @@ public class Photo extends BaseEntity {
 
     public void setUserCreated(Account userCreated) {
         this.userCreated = userCreated;
+    }
+
+    public void hide() {
+        this.isShow = Boolean.FALSE;
+    }
+
+    public void show() {
+        this.isShow = Boolean.TRUE;
     }
 }

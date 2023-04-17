@@ -118,13 +118,13 @@ public class PhotoService {
     @Transactional(readOnly = true)
     public Page<Photo> findAllPhotoOrderByLikeCount(int page) {
         Pageable pageable = PageRequest.of(page, 12, Sort.by("likeCount").descending().and(Sort.by("createdDate").descending()));
-        return photoRepository.findAll(pageable);
+        return photoRepository.findPhotosWhereIsShowTrue(pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<Photo> findAllPhotoOrderByLatest(int page) {
         Pageable pageable = PageRequest.of(page, 12, Sort.by("createdDate").descending());
-        return photoRepository.findAll(pageable);
+        return photoRepository.findPhotosWhereIsShowTrue(pageable);
     }
 
 
@@ -166,6 +166,20 @@ public class PhotoService {
         synchronized (photo) {
             photo.cancelLikePhoto(user);
         }
+        photoRepository.save(photo);
+    }
+
+    @Transactional
+    public void hidePhoto(long photoId) {
+        Photo photo = photoRepository.findById(photoId).get();
+        photo.hide();
+        photoRepository.save(photo);
+    }
+
+    @Transactional
+    public void showPhoto(long photoId) {
+        Photo photo = photoRepository.findById(photoId).get();
+        photo.show();
         photoRepository.save(photo);
     }
 }

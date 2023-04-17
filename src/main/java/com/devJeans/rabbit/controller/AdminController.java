@@ -44,13 +44,10 @@ public class AdminController {
         this.photoService = photoService;
     }
 
-    @DeleteMapping("/photo")
+    @PostMapping("/photo")
     @PreAuthorize("hasRole('ADMIN')")
-    public ApiResult<String> deletePhoto(Principal principal,@RequestParam Long photoId) {
-        Account adminUser = accountService.getAccount(Long.valueOf(principal.getName()));
-
-        photoService.deletePhoto(adminUser.getId(), photoId);
-
-        return succeed("사진이 정상적으로 삭제 되었습니다. 사진 id : " + photoId);
+    public ApiResult<String> hidePhoto(@RequestParam Long photoId) {
+        photoService.hidePhoto(photoId);
+        return succeed("사진이 숨김 처리 되었습니다. 사진 id : " + photoId);
     }
 }
