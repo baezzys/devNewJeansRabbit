@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.security.Principal;
 
 import static com.devJeans.rabbit.bind.ApiResult.succeed;
+import static com.google.common.base.Preconditions.checkArgument;
 
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com", "https://stg-devjeans.dev-hee.com"}, allowCredentials = "true")
@@ -46,8 +47,9 @@ public class PhotoController {
     @PostMapping("/upload")
     @Transactional
     public ApiResult<PhotoDto> uploadPhoto(@RequestParam("image") MultipartFile image, @RequestParam("thumbnail") MultipartFile thumbnail, @RequestParam("photo_title") String photoTitle, Principal principal) throws IOException {
-
         Account user = accountService.getAccount(Long.valueOf(principal.getName()));
+
+        checkArgument(user.getIsBlockedUser().equals(Boolean.FALSE), "차단된 유저는 해당 기능을 사용할 수 없습니다.");
 
         Photo savedPhoto = photoService.uploadPhoto(image, thumbnail, photoTitle, user);
         return succeed(PhotoDto.of(savedPhoto));

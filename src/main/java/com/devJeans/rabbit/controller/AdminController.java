@@ -44,10 +44,19 @@ public class AdminController {
         this.photoService = photoService;
     }
 
-    @PostMapping("/photo")
+    @PostMapping("/photo/hide")
     @PreAuthorize("hasRole('ADMIN')")
     public ApiResult<String> hidePhoto(@RequestParam Long photoId) {
         photoService.hidePhoto(photoId);
         return succeed("사진이 숨김 처리 되었습니다. 사진 id : " + photoId);
+    }
+
+    @PostMapping("/user/block")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ApiResult<String> blockUser(@RequestParam long userId) {
+        Account account = accountRepository.findById(userId).get();
+        account.block();
+        accountRepository.save(account);
+        return succeed("유저가 성공적으로 차단 되었습니다. id : " + userId);
     }
 }
