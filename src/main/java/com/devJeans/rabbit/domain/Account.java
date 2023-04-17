@@ -21,13 +21,20 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String firstName;
 
+    @Column(nullable = false)
     private String lastName;
 
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String profilePictureUrl;
+
+    @Column(nullable = false)
+    private Boolean isBlockedUser = Boolean.FALSE;
 
     @ManyToMany(mappedBy = "userLiked")
     private Set<Photo> likedPhotos = new HashSet<>();
@@ -35,6 +42,7 @@ public class Account {
     @OneToMany(mappedBy = "userCreated", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Photo> createdPhotos = new ArrayList<>();
 
+    @Column(nullable = false)
     private String roles;
 
     public Account(Long id, String firstName, String lastName, String email, String pictureUrl) {
@@ -70,5 +78,13 @@ public class Account {
             return true;
         }
         return false;
+    }
+
+    public Boolean getBlockedUser() {
+        return isBlockedUser;
+    }
+
+    public void block() {
+        this.isBlockedUser = true;
     }
 }

@@ -5,6 +5,7 @@ import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.domain.Photo;
 import com.devJeans.rabbit.dto.AccountDto;
 import com.devJeans.rabbit.dto.PhotoDto;
+import com.devJeans.rabbit.repository.AccountRepository;
 import com.devJeans.rabbit.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,9 @@ public class AccountController {
 
     @Autowired
     AccountService accountService;
+
+    @Autowired
+    AccountRepository accountRepository;
 
     @GetMapping("/info")
     @Transactional
