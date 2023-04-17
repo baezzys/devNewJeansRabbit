@@ -1,14 +1,14 @@
 app:
-  jwtSecret: ${app_secret}
-  googleClientId: ${googleClientId}
+  jwtSecret: ${APP_SECRET}
+  googleClientId: ${GOOGLE_CLIENT_ID}
 
 
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${datasource_url}
-    username: ${datasource_username}
-    password: ${datasource_password}
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
   jpa:
     database-platform: org.hibernate.dialect.MariaDB103Dialect
     hibernate:
@@ -30,8 +30,8 @@ spring:
 
 aws:
   s3:
-    accessKey: ${aws_s3_accessKey}
-    secretKey: ${aws_s3_secretKey}
+    accessKey: ${AWS_S3_ACCESSKEY}
+    secretKey: ${AWS_S3_SECRETKEY}
     region: ap-northeast-2
 logging:
   level:
