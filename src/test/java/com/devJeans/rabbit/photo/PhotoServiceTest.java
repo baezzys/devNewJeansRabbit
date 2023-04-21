@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.devJeans.rabbit.BunnyTestcontainers;
 import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.domain.Photo;
+import com.devJeans.rabbit.domain.Report;
 import com.devJeans.rabbit.repository.AccountRepository;
 import com.devJeans.rabbit.repository.PhotoRepository;
 import com.devJeans.rabbit.service.AccountService;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -189,6 +191,25 @@ public class PhotoServiceTest {
         }
         Photo result = photoRepository.findById(savedPhoto.getId()).get();
         assertEquals(result.getLikeCount(), 10);
+    }
+
+    @Test
+    @Transactional
+    void reportPhotoTest() {
+        Account user = new Account("test", "test", "test", "test");
+
+        accountRepository.save(user);
+
+        Photo photo = new Photo("http://example.com/image.jpg", "http://example.com/thumbnail.jpg", "image.jpg", "thumbnail.jpg", "Test photo", user);
+        Photo savedPhoto = photoRepository.save(photo);
+
+        photoService.reportPhoto(user, savedPhoto, Report.ReportType.VIOLENCE);
+        assertEquals(savedPhoto.getReportedCount(), 1);
+        assertEquals(user.getReports().size(), 1);
+
+        Exception exception = assertThrows(IllegalStateException.class, () -> photoService.reportPhoto(user, savedPhoto, Report.ReportType.VIOLENCE));
+        assertEquals("Photo has already been reported by the user", exception.getMessage());
+
     }
 
     class MockPrincipal implements Principal {
