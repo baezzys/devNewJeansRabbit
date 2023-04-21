@@ -6,8 +6,10 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.domain.Photo;
+import com.devJeans.rabbit.domain.Report;
 import com.devJeans.rabbit.repository.AccountRepository;
 import com.devJeans.rabbit.repository.PhotoRepository;
+import com.devJeans.rabbit.repository.ReportRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.hibernate.StaleStateException;
@@ -42,18 +44,18 @@ public class PhotoService {
 
     private final AccountService accountService;
 
+    private final ReportRepository reportRepository;
+
     private final String BUCKET_NAME = "devjeans-photo";
 
-    private final EntityManager entityManager;
-
-    public PhotoService(PhotoRepository photoRepository, AmazonS3 s3client, AccountService accountService, EntityManager entityManager,
-                        AccountRepository accountRepository) {
+    public PhotoService(AccountRepository accountRepository, PhotoRepository photoRepository, AmazonS3 s3client, AccountService accountService, ReportRepository reportRepository) {
+        this.accountRepository = accountRepository;
         this.photoRepository = photoRepository;
         this.s3client = s3client;
         this.accountService = accountService;
-        this.entityManager = entityManager;
-        this.accountRepository = accountRepository;
+        this.reportRepository = reportRepository;
     }
+
 
     @Transactional
     public Photo uploadPhoto(MultipartFile image, MultipartFile thumbnail, String photoTitle, Account user) throws IOException {
@@ -181,5 +183,17 @@ public class PhotoService {
         Photo photo = photoRepository.findById(photoId).get();
         photo.show();
         photoRepository.save(photo);
+    }
+
+    public void reportPhoto(Account user, Photo photo, Report.ReportType reportType) {
+        if (reportRepository.existsByUserAndPhoto(user, photo)) {
+            throw new IllegalStateException("Photo has already been reported by the user");
+        }
+
+        Report report = new Report(user, photo, reportType);
+        photo.addReport(report);
+        user.addReport(report);
+
+        reportRepository.save(report);
     }
 }

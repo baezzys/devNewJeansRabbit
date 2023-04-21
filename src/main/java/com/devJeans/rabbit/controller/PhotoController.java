@@ -3,6 +3,7 @@ package com.devJeans.rabbit.controller;
 import com.devJeans.rabbit.bind.ApiResult;
 import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.domain.Photo;
+import com.devJeans.rabbit.domain.Report;
 import com.devJeans.rabbit.dto.PhotoDto;
 import com.devJeans.rabbit.repository.PhotoRepository;
 import com.devJeans.rabbit.service.AccountService;
@@ -122,5 +123,17 @@ public class PhotoController {
             return succeed(Boolean.TRUE);
         }
         return succeed(Boolean.FALSE);
+    }
+
+    @PostMapping("/report/{id}")
+    @Transactional
+    public ApiResult<String> reportPhoto(Principal principal, @PathVariable("id") Long photoId, Report.ReportType reportType) {
+        checkArgument(reportType != null, "report type이 명시되어야 합니다.");
+
+        Account user = accountService.getAccount(Long.valueOf(principal.getName()));
+        Photo photo = photoRepository.findById(photoId).orElseThrow(EntityNotFoundException::new);
+
+        photoService.reportPhoto(user, photo, reportType);
+        return succeed("해당 사진이 성공적으로 신고되었습니다. id : " + photoId);
     }
 }
