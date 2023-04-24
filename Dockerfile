@@ -1,13 +1,10 @@
+# Dockerfile
 FROM openjdk:11-jre-slim
 
-ARG JAR_FILE=./build/libs/oauth-0.0.1-SNAPSHOT.jar
+WORKDIR /app
 
-COPY ${JAR_FILE} app.jar
+ARG JAR_FILE=*.jar
 
-COPY /src/main/resources/application.yaml application.yaml
+COPY ${JAR_FILE} /app/application.jar
 
-WORKDIR /HOME/spring/
-
-EXPOSE 8080
-
-CMD ["bash", "-c", "java -jar ./app.jar"]
+CMD java -jar /app/application.jar
