@@ -32,7 +32,7 @@ aws:
   s3:
     accessKey: ${AWS_S3_ACCESSKEY}
     secretKey: ${AWS_S3_SECRETKEY}
-    region: ap-northeast-2
+    region: ${AWS_REGION}
 logging:
   level:
     org:
