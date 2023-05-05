@@ -4,4 +4,5 @@
 src/main/resources
 build
 rebuild_application_and_deploy.sh
+src/main/resources/application.yaml
 
