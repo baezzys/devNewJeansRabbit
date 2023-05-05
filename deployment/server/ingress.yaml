@@ -1,9 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: server-ing
+  name: server-ingress
 spec:
-  ingressClassName: nginx
+  ingressClassName: server
   rules:
     - host: api-test.dev-hee.com ## Route53에 수동으로 ingress nlb와 연결 필요 
       http:
