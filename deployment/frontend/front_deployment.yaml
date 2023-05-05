@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devjeans-front
+  labels:
+    tier: front
+    app: devjeans
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devjeans
+      tier: front
+  template:
+    metadata:
+      labels:
+        app: devjeans
+        tier: front
+    spec:
+      containers:
+        - name: devjeans-front
+          image: patnmat/devjeans-front:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: devjeans-front
+  labels:
+    app: devjeans
+    tier: front
+spec:
+  selector:
+    app: devjeans
+    tier: front
+  ports:
+    - name: front
+      port: 80
+      targetPort: 80
