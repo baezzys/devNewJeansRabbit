@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: front-ingress
+spec:
+  ingressClassName: front
+  rules:
+    - host: stg-devjeans.dev-hee.com ## 수동으로 route53에 ingress nlb 연결 필요
+      http:
+        paths:
+          - backend:
+              service:
+                name: devjeans-front
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
