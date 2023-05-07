@@ -119,8 +119,9 @@ public class PhotoService {
 
     @Transactional(readOnly = true)
     public Page<Photo> findAllPhotoOrderByLikeCount(int page) {
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
         Pageable pageable = PageRequest.of(page, 12, Sort.by("likeCount").descending().and(Sort.by("createdDate").descending()));
-        return photoRepository.findPhotosWhereIsShowTrue(pageable);
+        return photoRepository.findPhotosWhereIsShowTrueAndCreatedDateAfter(pageable, oneWeekAgo);
     }
 
     @Transactional(readOnly = true)
