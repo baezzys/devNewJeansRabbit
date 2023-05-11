@@ -26,15 +26,16 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: devjeans-front
+  name: devjeans-front-service
   labels:
     app: devjeans
-    tier: front
 spec:
+  type: ClusterIP
   selector:
     app: devjeans
     tier: front
   ports:
-    - name: front
+    - name: http
       port: 80
       targetPort: 80
+
