@@ -6,3 +6,4 @@ Dockerfile
 *.md
 *.sh
 /deployment
+.ebextensions
