@@ -9,3 +9,6 @@ Dockerfile
 .ebextensions
 Procfile
 /workflows/*
+*.iml
+gradle
+src
