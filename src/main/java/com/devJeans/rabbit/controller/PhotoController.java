@@ -3,12 +3,15 @@ package com.devJeans.rabbit.controller;
 import com.devJeans.rabbit.bind.ApiResult;
 import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.domain.Photo;
+import com.devJeans.rabbit.domain.Report;
 import com.devJeans.rabbit.dto.PhotoDto;
 import com.devJeans.rabbit.repository.PhotoRepository;
 import com.devJeans.rabbit.service.AccountService;
 import com.devJeans.rabbit.service.PhotoService;
 import org.hibernate.StaleStateException;
 import org.springframework.data.domain.Page;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,9 +25,10 @@ import java.io.IOException;
 import java.security.Principal;
 
 import static com.devJeans.rabbit.bind.ApiResult.succeed;
+import static com.google.common.base.Preconditions.checkArgument;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com", "https://stg-devjeans.dev-hee.com"}, allowCredentials = "true")
 @RequestMapping("/photo")
 public class PhotoController {
 
@@ -44,8 +48,9 @@ public class PhotoController {
     @PostMapping("/upload")
     @Transactional
     public ApiResult<PhotoDto> uploadPhoto(@RequestParam("image") MultipartFile image, @RequestParam("thumbnail") MultipartFile thumbnail, @RequestParam("photo_title") String photoTitle, Principal principal) throws IOException {
-
         Account user = accountService.getAccount(Long.valueOf(principal.getName()));
+
+        checkArgument(user.getIsBlockedUser().equals(Boolean.FALSE), "차단된 유저는 해당 기능을 사용할 수 없습니다.");
 
         Photo savedPhoto = photoService.uploadPhoto(image, thumbnail, photoTitle, user);
         return succeed(PhotoDto.of(savedPhoto));
@@ -53,6 +58,7 @@ public class PhotoController {
     }
 
     @PostMapping("/like/{id}")
+    @Retryable(value = {StaleStateException.class}, backoff = @Backoff(delay = 1000), maxAttempts = 10)
     @Transactional
     public ApiResult<PhotoDto> likePhoto(@PathVariable("id") Long photoId, Principal principal) {
         Account user = accountService.getAccount(Long.valueOf(principal.getName()));
@@ -64,6 +70,7 @@ public class PhotoController {
     }
 
     @PostMapping("/like/cancel/{id}")
+    @Retryable(value = {StaleStateException.class}, backoff = @Backoff(delay = 1000), maxAttempts = 10)
     @Transactional
     public ApiResult<PhotoDto> cancelLikePhoto(@PathVariable("id") Long photoId, Principal principal) {
         Account user = accountService.getAccount(Long.valueOf(principal.getName()));
@@ -116,5 +123,17 @@ public class PhotoController {
             return succeed(Boolean.TRUE);
         }
         return succeed(Boolean.FALSE);
+    }
+
+    @PostMapping("/report/{id}")
+    @Transactional
+    public ApiResult<String> reportPhoto(Principal principal, @PathVariable("id") Long photoId, Report.ReportType reportType) {
+        checkArgument(reportType != null, "report type이 명시되어야 합니다.");
+
+        Account user = accountService.getAccount(Long.valueOf(principal.getName()));
+        Photo photo = photoRepository.findById(photoId).orElseThrow(EntityNotFoundException::new);
+
+        photoService.reportPhoto(user, photo, reportType);
+        return succeed("해당 사진이 성공적으로 신고되었습니다. id : " + photoId);
     }
 }

@@ -1,0 +1,93 @@
+app:
+  jwtSecret: ${APP_SECRET}
+  googleClientId: ${GOOGLE_CLIENT_ID}
+
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDB103Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Seoul
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+      resolve-lazily: true
+
+  jackson:
+    time-zone: Asia/Seoul
+    serialization:
+      write_dates_as_timestamps: false
+
+aws:
+  s3:
+    accessKey: ${AWS_S3_ACCESSKEY}
+    secretKey: ${AWS_S3_SECRETKEY}
+    region: ${AWS_REGION}
+logging:
+  level:
+    org:
+      springframework:
+        web: debug
+      hibernate: DEBUG
+
+server:
+  tomcat:
+    remoteip:
+      protocol-header: x-forwarded-proto
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url:
+    username:
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.MariaDB103Dialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Asia/Seoul
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+      resolve-lazily: true
+
+  jackson:
+    time-zone: Asia/Seoul
+    serialization:
+      write_dates_as_timestamps: false
+
+aws:
+  s3:
+    accessKey: ${aws_s3_accessKey}
+    secretKey: ${aws_s3_secretKey}
+    region: ap-northeast-2
+logging:
+  level:
+    org:
+      springframework:
+        web: debug
+      hibernate: DEBUG
+
+server:
+  tomcat:
+    remoteip:
+      protocol-header: x-forwarded-proto

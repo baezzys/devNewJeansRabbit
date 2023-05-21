@@ -4,6 +4,7 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.devJeans.rabbit.BunnyTestcontainers;
 import com.devJeans.rabbit.domain.Account;
 import com.devJeans.rabbit.domain.Photo;
+import com.devJeans.rabbit.domain.Report;
 import com.devJeans.rabbit.repository.AccountRepository;
 import com.devJeans.rabbit.repository.PhotoRepository;
 import com.devJeans.rabbit.service.AccountService;
@@ -14,18 +15,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 
 import javax.persistence.EntityManager;
+import javax.security.auth.Subject;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @BunnyTestcontainers
@@ -135,6 +143,92 @@ public class PhotoServiceTest {
         for (Account account : accountList) {
             assertEquals(account.getLikedPhotos().size(), 1);
         }
+    }
+
+    @Test
+    public void testLikePhotoControllerConcurrently() throws InterruptedException {
+        List<Account> accountList = new ArrayList<>();
+        List<Principal> principals = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            Account account = new Account("user1", "password1", "John Doe" + i, "test");
+            accountList.add(account);
+            accountRepository.save(account);
+            MockPrincipal principal = new MockPrincipal(String.valueOf(account.getId()));
+            principals.add(principal);
+        }
+
+        Photo photo = new Photo("http://example.com/image.jpg", "http://example.com/thumbnail.jpg", "image.jpg", "thumbnail.jpg", "Test photo", accountList.get(0));
+        Photo savedPhoto = photoRepository.save(photo);
+
+        List<Account> savedAccountList = accountRepository.findAll();
+
+        int threadNum = 10;
+        Thread[] threads = new Thread[threadNum];
+        for (int i = 0; i < threadNum; i++) {
+            Account account = savedAccountList.get(i);
+            Principal principal = principals.get(i);
+            threads[i] = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        mockMvc.perform(post("/photo/like/{id}", savedPhoto.getId())
+                                        .principal(principal)
+                                        .contentType(MediaType.APPLICATION_JSON));
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+        }
+
+        for (Thread thread : threads) {
+            thread.start();
+        }
+
+        for (Thread thread : threads) {
+            thread.join();
+        }
+        Photo result = photoRepository.findById(savedPhoto.getId()).get();
+        assertEquals(result.getLikeCount(), 10);
+    }
+
+    @Test
+    @Transactional
+    void reportPhotoTest() {
+        Account user = new Account("test", "test", "test", "test");
+
+        accountRepository.save(user);
+
+        Photo photo = new Photo("http://example.com/image.jpg", "http://example.com/thumbnail.jpg", "image.jpg", "thumbnail.jpg", "Test photo", user);
+        Photo savedPhoto = photoRepository.save(photo);
+
+        photoService.reportPhoto(user, savedPhoto, Report.ReportType.VIOLENCE);
+        assertEquals(savedPhoto.getReportedCount(), 1);
+        assertEquals(user.getReports().size(), 1);
+
+        Exception exception = assertThrows(IllegalStateException.class, () -> photoService.reportPhoto(user, savedPhoto, Report.ReportType.VIOLENCE));
+        assertEquals("Photo has already been reported by the user", exception.getMessage());
 
     }
+
+    class MockPrincipal implements Principal {
+
+        private final String name;
+
+        public MockPrincipal(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public boolean implies(Subject subject) {
+            return Principal.super.implies(subject);
+        }
+    }
+
 }

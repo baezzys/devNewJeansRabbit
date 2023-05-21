@@ -18,7 +18,7 @@ import static com.devJeans.rabbit.bind.ApiResult.failed;
 import static com.devJeans.rabbit.bind.ApiResult.succeed;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com"}, allowCredentials = "true")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com", "https://stg-devjeans.dev-hee.com"}, allowCredentials = "true")
 @RequestMapping("/v1/oauth")
 public class LoginController {
 
@@ -31,7 +31,7 @@ public class LoginController {
         String authToken = accountService.loginOAuthGoogle(requestBody);
         final ResponseCookie cookie = ResponseCookie.from("AUTH-TOKEN", authToken)
                 .httpOnly(true)
-                .maxAge(3600 * 24)
+                .maxAge(3600 * 24 * 3)
                 .path("/")
                 .sameSite("none")
                 .secure(true)

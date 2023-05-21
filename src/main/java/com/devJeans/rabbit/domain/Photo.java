@@ -1,10 +1,14 @@
 package com.devJeans.rabbit.domain;
 
+import com.devJeans.rabbit.util.AtomicIntConverter;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Entity
 public class Photo extends BaseEntity {
@@ -31,6 +35,9 @@ public class Photo extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Account userCreated;
 
+    @Column(nullable = false)
+    Boolean isShow = true;
+
     @ManyToMany
     @JoinTable(
             name = "account_liked_photos",
@@ -44,6 +51,23 @@ public class Photo extends BaseEntity {
 
     @Column(nullable = false)
     private int visitCount = 0;
+
+    @Column(nullable = false)
+    @Convert(converter = AtomicIntConverter.class)
+    private AtomicInteger reportedCount = new AtomicInteger();
+
+    @OneToMany(mappedBy = "photo", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reports = new ArrayList<>();
+
+    public List<Report> getReports() {
+        return reports;
+    }
+
+    public void addReport(Report report) {
+        reports.add(report);
+        reportedCount.getAndIncrement();
+        report.setPhoto(this);
+    }
 
     @Version
     Long version;
@@ -132,5 +156,17 @@ public class Photo extends BaseEntity {
 
     public void setUserCreated(Account userCreated) {
         this.userCreated = userCreated;
+    }
+
+    public void hide() {
+        this.isShow = Boolean.FALSE;
+    }
+
+    public void show() {
+        this.isShow = Boolean.TRUE;
+    }
+
+    public int getReportedCount() {
+        return reportedCount.get();
     }
 }
