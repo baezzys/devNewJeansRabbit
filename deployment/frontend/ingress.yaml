@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: stg-devjeans.dev-hee.com
+    - host: devjeans.dev-hee.com
       http:
         paths:
           - backend:
