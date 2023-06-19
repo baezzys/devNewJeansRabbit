@@ -18,6 +18,8 @@ spec:
         app: devjeans
         tier: front
     spec:
+      nodeSelector:
+        kops.k8s.io/instancegroup: nodes
       containers:
       - name: devjeans-front
         image: patnmat/devjeans-front:latest
