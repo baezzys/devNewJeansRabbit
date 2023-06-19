@@ -20,8 +20,8 @@ spec:
       annotations:
         kops.k8s.io/instancegroup: nodes
     spec:
-      # nodeSelector:
-      #   kops.k8s.io/instancegroup: nodes
+      nodeSelector:
+        kops.k8s.io/instancegroup: nodes
       containers:
       - name: devjeans-server
         image: patnmat/devjeans-server:latest
