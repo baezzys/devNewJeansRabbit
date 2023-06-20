@@ -7,7 +7,6 @@ metadata:
     tier: front
     app: devjeans
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: devjeans
