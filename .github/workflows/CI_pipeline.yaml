@@ -1,8 +1,8 @@
-name: Main Backend CI
+name: Stg Backend CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
 
 jobs:
   dockerize:
@@ -15,7 +15,7 @@ jobs:
         run: ./gradlew build
         
       - name: Docker 빌드
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:${{ github.sha }} .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/stg-devjeans-server:${{ github.sha }} .
         
       - name: Docker Hub 로그인
         uses: docker/login-action@v2.1.0
@@ -24,7 +24,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Docker Hub 퍼블리시
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:${{ github.sha }} 
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/stg-devjeans-server:${{ github.sha }} 
 
   update-k8s-manifest:
     needs: dockerize
@@ -33,7 +33,7 @@ jobs:
       - name: Checkout 인프라 레포
         uses: actions/checkout@v3
         with:
-          ref: main
+          ref: dev
           repository: ${{ secrets.INFRA_GIT_REPO}}
           token: ${{ secrets.SERVER_GIT_TOKEN }}
           
@@ -45,8 +45,8 @@ jobs:
       - name: 쿠버네티스 파일 업데이트
         run: |
           cd deployment/server
-          sed -i "s#${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:.*#${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:${{ github.sha }}#g" deployment.yaml
+          sed -i "s#${{ secrets.DOCKERHUB_USERNAME }}/stg-devjeans-server:.*#${{ secrets.DOCKERHUB_USERNAME }}/stg-devjeans-server:${{ github.sha }}#g" deployment.yaml
          
           git add -A
-          git commit -m "update server-image tag:${{ github.sha }}"
-          git push origin main
+          git commit -m "update stg-server-image tag:${{ github.sha }}"
+          git push origin dev
