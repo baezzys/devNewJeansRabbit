@@ -18,7 +18,6 @@ import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Data
 @MappedSuperclass
 @Accessors(chain = true)
 @EntityListeners(value = { AuditingEntityListener.class })
