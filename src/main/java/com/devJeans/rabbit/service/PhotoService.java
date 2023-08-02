@@ -10,7 +10,6 @@ import com.devJeans.rabbit.domain.Report;
 import com.devJeans.rabbit.repository.AccountRepository;
 import com.devJeans.rabbit.repository.PhotoRepository;
 import com.devJeans.rabbit.repository.ReportRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.data.domain.Page;
@@ -31,7 +30,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
-@Slf4j
 public class PhotoService {
 
     private static final Log logger = LogFactory.getLog(PhotoService.class);
@@ -59,7 +57,7 @@ public class PhotoService {
 
     @Transactional
     public Photo uploadPhoto(MultipartFile image, MultipartFile thumbnail, String photoTitle, Account user) throws IOException {
-        log.debug("file upload 시작 : " + image.getOriginalFilename());
+        logger.debug("file upload 시작 : " + image.getOriginalFilename());
 
         String fileName = image.getOriginalFilename();
 

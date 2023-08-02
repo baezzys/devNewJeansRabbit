@@ -7,21 +7,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+
 public class AccountDto {
+
+    public AccountDto(String email, String profileImage) {
+        this.email = email;
+        this.profileImage = profileImage;
+    }
 
     private String email;
 
     private String profileImage;
 
     public static final AccountDto of(Account account) {
-        return AccountDto.builder()
-                .email(account.getEmail())
-                .profileImage(account.getProfilePictureUrl())
-                .build();
+        return new AccountDto(account.getEmail(), account.getProfilePictureUrl());
     }
 }
