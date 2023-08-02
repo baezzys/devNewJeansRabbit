@@ -4,4 +4,4 @@
 src/main/resources
 build
 rebuild_application_and_deploy.sh
-
+.github/*
