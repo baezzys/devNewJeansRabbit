@@ -3,15 +3,10 @@ package com.devJeans.rabbit.controller;
 import com.devJeans.rabbit.bind.ApiResult;
 import com.devJeans.rabbit.dto.IdTokenRequestDto;
 import com.devJeans.rabbit.service.AccountService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import static com.devJeans.rabbit.bind.ApiResult.failed;
@@ -21,9 +16,11 @@ import static com.devJeans.rabbit.bind.ApiResult.succeed;
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com", "https://stg-devjeans.dev-hee.com"}, allowCredentials = "true")
 @RequestMapping("/v1/oauth")
 public class LoginController {
+    private final AccountService accountService;
 
-    @Autowired
-    AccountService accountService;
+    public LoginController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     @PostMapping("/login")
     public ApiResult LoginWithGoogleOauth2(@RequestBody IdTokenRequestDto requestBody, HttpServletResponse response) {
