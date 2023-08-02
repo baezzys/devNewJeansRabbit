@@ -1,10 +1,5 @@
 package com.devJeans.rabbit.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,10 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Table(name = "account")
 public class Account {
 
@@ -57,6 +48,10 @@ public class Account {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reports = new ArrayList<>();
+
+    public Account() {
+
+    }
 
     public List<Report> getReports() {
         return reports;
@@ -109,5 +104,37 @@ public class Account {
 
     public void block() {
         this.isBlockedUser = true;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getProfilePictureUrl() {
+        return profilePictureUrl;
+    }
+
+    public Set<Photo> getLikedPhotos() {
+        return likedPhotos;
+    }
+
+    public List<Photo> getCreatedPhotos() {
+        return createdPhotos;
+    }
+
+    public String getRoles() {
+        return roles;
     }
 }
