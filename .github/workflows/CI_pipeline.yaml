@@ -45,7 +45,7 @@ jobs:
       - name: 쿠버네티스 파일 업데이트
         run: |
           cd deployment/server
-          sed -i "s#${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:.*#${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:${{ github.sha }}#g" deployment.yaml
+          sed -i "s#${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:.*#${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:${{ github.sha }}#g" job.yaml
          
           git add -A
           git commit -m "update server-image tag:${{ github.sha }}"
