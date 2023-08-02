@@ -24,7 +24,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Docker Hub 퍼블리시
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/devjeans-server:${{ github.sha }} 
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:${{ github.sha }} 
 
   update-k8s-manifest:
     needs: dockerize
