@@ -11,6 +11,9 @@ jobs:
       - name: Checkout 코드 저장소 
         uses: actions/checkout@v3
         
+      - name: 스프링부트 애플리케이션 빌드
+        run: ./gradlew build
+        
       - name: Docker 빌드
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/devjeans-server:${{ github.sha }} .
         
