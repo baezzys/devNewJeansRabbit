@@ -20,6 +20,10 @@ spec:
       annotations:
         kops.k8s.io/instancegroup: nodes
     spec:
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
       # nodeSelector:
       #   kops.k8s.io/instancegroup: nodes
       containers:
@@ -37,8 +41,8 @@ spec:
         envFrom:
         - configMapRef:
             name: server-config
-        # - secretRef:
-        #     name: server-secrets
+        - secretRef:
+            name: server-secrets
         volumeMounts:
         - name: devjeans-server
           mountPath: "/devjeans/server/logs" # 로그 디렉토리 경로
