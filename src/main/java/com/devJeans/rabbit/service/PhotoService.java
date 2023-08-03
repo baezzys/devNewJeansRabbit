@@ -11,19 +11,22 @@ import com.devJeans.rabbit.repository.AccountRepository;
 import com.devJeans.rabbit.repository.PhotoRepository;
 import com.devJeans.rabbit.repository.ReportRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import net.coobird.thumbnailator.Thumbnails;
+import org.hibernate.StaleStateException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
-import javax.persistence.EntityNotFoundException;
-import java.awt.Graphics2D;
+import javax.persistence.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -33,9 +36,6 @@ import java.time.LocalDateTime;
 @Service
 @Slf4j
 public class PhotoService {
-
-    private static final Log logger = LogFactory.getLog(PhotoService.class);
-
     private final AccountRepository accountRepository;
 
     private final PhotoRepository photoRepository;
@@ -163,7 +163,6 @@ public class PhotoService {
     @Transactional
     public void cancelLikePhoto(Photo photo, Account user) {
         if (!photo.getUserLiked().contains(user)) {
-            logger.error("user : " + user.getId() + " 는 이미 사진 id : " + photo.getId() + " 에 좋아요를 눌렀습니다.");
             throw new IllegalArgumentException("좋아요를 누르지 않은 사진에 대해서 좋아요 취소를 할 수 없습니다.");
         }
         synchronized (photo) {
