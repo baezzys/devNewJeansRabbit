@@ -27,18 +27,3 @@ spec:
                 name: server-config
             - secretRef:
                 name: server-secrets
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: server-svc
-  labels:
-    app: devjeans
-spec:
-  selector:
-    app: devjeans
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
-  type: ClusterIP
