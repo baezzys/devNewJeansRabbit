@@ -55,13 +55,10 @@ public class AccountService {
     public Account createOrUpdateUser(Account account) {
         Account existingAccount = accountRepository.findByEmail(account.getEmail()).orElse(null);
         if (existingAccount == null) {
-            account.setRoles("ROLE_USER");
+            account.updateRole("ROLE_USER");
             accountRepository.save(account);
             return account;
         }
-        existingAccount.setFirstName(account.getFirstName());
-        existingAccount.setLastName(account.getLastName());
-        existingAccount.setProfilePictureUrl(account.getProfilePictureUrl());
         accountRepository.save(existingAccount);
         return existingAccount;
     }

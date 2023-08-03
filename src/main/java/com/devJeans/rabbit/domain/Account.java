@@ -137,4 +137,12 @@ public class Account {
     public String getRoles() {
         return roles;
     }
+
+    public void updateRole(String role) {
+        this.roles = role;
+    }
+
+    public Boolean getIsBlockedUser() {
+        return isBlockedUser;
+    }
 }
