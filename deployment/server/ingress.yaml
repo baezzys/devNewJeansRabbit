@@ -1,16 +1,16 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: server
+  name: server-ingress
 spec:
-  ingressClassName: nginx
+  ingressClassName: server
   rules:
-    - host: server.dev-hee.com  # server.
+    - host: server.dev-hee.com 
       http:
         paths:
           - backend:
               service:
-                name: devjeans-server-service 
+                name: server-svc  
                 port:
                   number: 8080
             path: /
