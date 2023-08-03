@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devjeans-server
+  labels:
+    app: devjeans
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devjeans
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: devjeans
+        tier: backend
+    spec:
+      containers:
+        - name: devjeans-server
+          image: patnmat/devjeans-server:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: server-config
+            - secretRef:
+                name: server-secrets
