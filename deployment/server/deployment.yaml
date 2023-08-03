@@ -16,11 +16,7 @@ spec:
       labels:
         app: devjeans
         tier: backend
-      annotations:
-        kops.k8s.io/instancegroup: nodes
     spec:
-      nodeSelector:
-        kops.k8s.io/instancegroup: nodes
       containers:
         - name: devjeans-server
           image: patnmat/devjeans-server:latest
