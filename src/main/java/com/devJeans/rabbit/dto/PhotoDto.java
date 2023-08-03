@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 public class PhotoDto {
 
-
     private Long photoId;
 
     private String imageUrl;
