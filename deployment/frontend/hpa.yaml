@@ -3,7 +3,6 @@ kind: HorizontalPodAutoscaler
 metadata:
   creationTimestamp: null
   name: devjeans-front
-  namespace: devjeans
 spec:
   maxReplicas: 5
   minReplicas: 1
