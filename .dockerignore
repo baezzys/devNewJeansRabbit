@@ -5,7 +5,6 @@
 Dockerfile
 *.md
 *.sh
-/deployment/*
+/deployment
 .ebextensions
 Procfile
-/workflows/*
