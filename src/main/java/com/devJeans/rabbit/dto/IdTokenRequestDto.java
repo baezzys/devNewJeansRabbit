@@ -5,15 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class IdTokenRequestDto {
 
     private String idToken;
-
-    public IdTokenRequestDto(String idToken) {
-        this.idToken = idToken;
-    }
-
-    public String getIdToken() {
-        return idToken;
-    }
 }
