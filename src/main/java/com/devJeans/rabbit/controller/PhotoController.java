@@ -8,10 +8,12 @@ import com.devJeans.rabbit.dto.PhotoDto;
 import com.devJeans.rabbit.repository.PhotoRepository;
 import com.devJeans.rabbit.service.AccountService;
 import com.devJeans.rabbit.service.PhotoService;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.StaleStateException;
 import org.springframework.data.domain.Page;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+import org.springframework.retry.support.RetrySynchronizationManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,12 +32,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com", "https://stg-devjeans.dev-hee.com"}, allowCredentials = "true")
 @RequestMapping("/photo")
+@Slf4j
 public class PhotoController {
 
     private final PhotoService photoService;
 
     private final AccountService accountService;
     private final PhotoRepository photoRepository;
+
+    private final static Object lock = new Object();
+
 
     public PhotoController(PhotoService photoService, AccountService accountService,
                            PhotoRepository photoRepository) {
@@ -58,15 +64,15 @@ public class PhotoController {
     }
 
     @PostMapping("/like/{id}")
-    @Retryable(value = {StaleStateException.class}, backoff = @Backoff(delay = 1000), maxAttempts = 10)
-    @Transactional
+    @Retryable(value = {StaleStateException.class}, backoff = @Backoff(delay = 2000), maxAttempts = 10)
     public ApiResult<PhotoDto> likePhoto(@PathVariable("id") Long photoId, Principal principal) {
-        Account user = accountService.getAccount(Long.valueOf(principal.getName()));
-        Photo photo = photoService.findPhotoById(photoId);
-
-        photoService.likePhoto(photo, user);
-
-        return succeed(PhotoDto.of(photo));
+        log.error("Retry Number : {}", RetrySynchronizationManager.getContext().getRetryCount());
+        synchronized (lock) {
+            log.error("현재 스레드 " + Thread.currentThread() + " start");
+            Photo photo = photoService.likePhoto(photoId, Long.valueOf(principal.getName()));
+            log.error("현재 스레드 " + Thread.currentThread() + " end");
+            return succeed(PhotoDto.of(photo));
+        }
     }
 
     @PostMapping("/like/cancel/{id}")

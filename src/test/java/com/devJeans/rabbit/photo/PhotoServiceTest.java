@@ -74,7 +74,7 @@ public class PhotoServiceTest {
         accountRepository.save(user2);
         photoRepository.save(photo);
 
-        photoService.likePhoto(photo , user2);
+        photoService.likePhoto(photo.getId() , user2.getId());
 
         assertEquals(user2.getLikedPhotos().contains(photo), Boolean.TRUE);
         assertEquals(photo.getLikeCount(), 1);
@@ -92,8 +92,8 @@ public class PhotoServiceTest {
         accountRepository.save(user2);
         photoRepository.save(photo);
 
-        photoService.likePhoto(photo , user2);
-        photoService.likePhoto(photo, user);
+        photoService.likePhoto(photo.getId() , user2.getId());
+        photoService.likePhoto(photo.getId(), user.getId());
         photoService.deletePhoto(user.getId(), photo.getId());
 
         assertEquals(user.getCreatedPhotos().size(), 0);
@@ -105,7 +105,9 @@ public class PhotoServiceTest {
     public void testLikePhotoServiceConcurrently() throws Exception {
 
         List<Account> accountList = new ArrayList<>();
-        for (int i = 0; i < 50; i++) {
+
+        int threadNum = 100;
+        for (int i = 0; i < threadNum; i++) {
             Account account = new Account("user1", "password1", "John Doe" + i, "test");
             accountList.add(account);
             accountRepository.save(account);
@@ -114,7 +116,6 @@ public class PhotoServiceTest {
         Photo photo = new Photo("http://example.com/image.jpg", "http://example.com/thumbnail.jpg", "image.jpg", "thumbnail.jpg", "Test photo", accountList.get(0));
         photoRepository.save(photo);
 
-        int threadNum = 50;
         // Create two threads that will execute the likePhoto() method simultaneously
         Thread[] threads = new Thread[threadNum];
         for (int i = 0; i < threadNum; i++) {
@@ -122,7 +123,7 @@ public class PhotoServiceTest {
             threads[i] = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    photoService.likePhoto(photo, account);
+                    photoService.likePhoto(photo.getId(), account.getId());
                 }
             });
         }
@@ -137,8 +138,8 @@ public class PhotoServiceTest {
 
         Photo updatedPhoto = photoRepository.findById(photo.getId()).get();
         System.out.println("테스트 결과 : " + updatedPhoto.getLikeCount());
-        assertEquals(50, updatedPhoto.getLikeCount());
-        assertEquals(50, updatedPhoto.getUserLiked().size());
+        assertEquals(threadNum, updatedPhoto.getLikeCount());
+        assertEquals(threadNum, updatedPhoto.getUserLiked().size());
 
         for (Account account : accountList) {
             assertEquals(account.getLikedPhotos().size(), 1);
@@ -149,8 +150,9 @@ public class PhotoServiceTest {
     public void testLikePhotoControllerConcurrently() throws InterruptedException {
         List<Account> accountList = new ArrayList<>();
         List<Principal> principals = new ArrayList<>();
+        int threadNum = 50;
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < threadNum; i++) {
             Account account = new Account("user1", "password1", "John Doe" + i, "test");
             accountList.add(account);
             accountRepository.save(account);
@@ -163,7 +165,6 @@ public class PhotoServiceTest {
 
         List<Account> savedAccountList = accountRepository.findAll();
 
-        int threadNum = 10;
         Thread[] threads = new Thread[threadNum];
         for (int i = 0; i < threadNum; i++) {
             Account account = savedAccountList.get(i);
@@ -190,7 +191,7 @@ public class PhotoServiceTest {
             thread.join();
         }
         Photo result = photoRepository.findById(savedPhoto.getId()).get();
-        assertEquals(result.getLikeCount(), 10);
+        assertEquals(result.getLikeCount(), threadNum);
     }
 
     @Test

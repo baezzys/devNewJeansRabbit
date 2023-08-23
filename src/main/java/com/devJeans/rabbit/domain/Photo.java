@@ -168,4 +168,8 @@ public class Photo extends BaseEntity {
     public int getReportedCount() {
         return reportedCount.get();
     }
+
+    public Long getVersion() {
+        return version;
+    }
 }
