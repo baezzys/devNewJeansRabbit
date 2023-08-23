@@ -149,7 +149,7 @@ public class PhotoService {
 
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public Photo likePhoto(long photoId, long userId) {
         Account user = accountService.getAccount(userId);
         Photo photo = findPhotoById(photoId);

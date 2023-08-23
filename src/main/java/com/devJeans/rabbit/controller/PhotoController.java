@@ -32,7 +32,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 @RestController
 @CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "https://devjeans.dev-hee.com", "https://www.devnewjeans.com", "https://stg-devjeans.dev-hee.com"}, allowCredentials = "true")
 @RequestMapping("/photo")
-@Slf4j
 public class PhotoController {
 
     private final PhotoService photoService;
@@ -66,11 +65,8 @@ public class PhotoController {
     @PostMapping("/like/{id}")
     @Retryable(value = {StaleStateException.class}, backoff = @Backoff(delay = 2000), maxAttempts = 10)
     public ApiResult<PhotoDto> likePhoto(@PathVariable("id") Long photoId, Principal principal) {
-        log.error("Retry Number : {}", RetrySynchronizationManager.getContext().getRetryCount());
         synchronized (lock) {
-            log.error("현재 스레드 " + Thread.currentThread() + " start");
             Photo photo = photoService.likePhoto(photoId, Long.valueOf(principal.getName()));
-            log.error("현재 스레드 " + Thread.currentThread() + " end");
             return succeed(PhotoDto.of(photo));
         }
     }
