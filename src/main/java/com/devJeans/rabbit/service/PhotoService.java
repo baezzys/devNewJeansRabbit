@@ -150,14 +150,15 @@ public class PhotoService {
     }
 
     @Transactional
-    public void likePhoto(Photo photo, Account user) {
+    public Photo likePhoto(long photoId, long userId) {
+        Account user = accountService.getAccount(userId);
+        Photo photo = findPhotoById(photoId);
         if (photo.getUserLiked().contains(user)) {
             throw new IllegalArgumentException("같은 사진에 좋아요를 2번이상 누를 수 없습니다.");
         }
-        synchronized (photo) {
-            photo.likePhoto(user);
-        }
+        photo.likePhoto(user);
         photoRepository.save(photo);
+        return photo;
     }
 
     @Transactional
